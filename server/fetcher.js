@@ -126,8 +126,9 @@ class Fetcher {
             data.actors = await this.getActors(showId);
             data.seasons = await this.getSeasons(showId);
             data.posters = await this.getPosters(showId);
+            data.banner = `https://www.thetvdb.com/banners/${data.banner}`;
             // console.log("final data", data);
-            console.log("Cached " + url);
+            // console.log("Cached " + url);
             cache.put(key, data, CACHE_DEFAULT);
             this.success++;
         } catch (e) {
@@ -177,7 +178,23 @@ class Fetcher {
             res.send(e.message);
             // throw new Error("Sign in failed, cannot perform actions!");
         }
+    }
 
+    async fetchEpisodes(showId, season) {
+        const url = `${REMOTE}series/${showId}/episodes/query?airedSeason=${season}`;
+        let key = `${showId}_episodes_${season}`
+        // Try cache first
+        let data = cache.get(key, "episodes");
+        if (data) {
+            console.log(`Returning cached ${key}`);
+            return data.content;
+        }
+
+        // console.log("Getting actors", url);
+        let response = await axios.get(url, this.getOpts());
+        let final = response.data.data;
+        cache.put(key, final, CACHE_DEFAULT, 'episodes');
+        return final;
     }
 
     /**

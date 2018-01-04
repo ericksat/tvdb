@@ -1,10 +1,37 @@
-#posters>span>img {
+#posters img {
     display: none;
 }
 
-#posters.active>span>img {
+#posters.active img {
     display: inline-block;
     margin: 8px;
     border: 1px solid #808080;
     border-radius: 16px;
+}
+
+.btn-season {
+    margin: 0 2px;
+    width: 44px;
+}
+
+.actor-item {
+    float: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px;
+    margin: 6px;
+    border: 1px solid white;
+    border-radius: 8px;
+    background-color: #444;
+}
+
+.actor-item__title {
+    text-align: center;
+    padding-bottom: 0.5rem;
+}
+
+.actor-item__image {
+    height: 192px;
+    object-fit: cover;
 }

@@ -1,14 +1,14 @@
 <template>
 <div class="container-fluid" style="margin-top: 2rem">
     <div v-if="content" class="show-container">
-        <img :src="getImage" />
+        <img :src="content.banner" />
         <h3>{{content.seriesName}} {{aliases}}</h3>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" href="#details" role="tab" data-toggle="tab" @click="selectDetails">Details</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#episodes" role="tab" data-toggle="tab">Episodes</a>
+                <a class="nav-link" href="#episodes" role="tab" data-toggle="tab" @click="selectEpisodes">Episodes</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#posters" role="tab" data-toggle="tab" @click="selectPosters">Posters</a>
@@ -29,15 +29,29 @@
                             {{item}}
                         </li>
                     </ul>
-                    <h4>Seasons</h4>
-                    <p>Total Seasons: {{content.seasons.seasons}}</p>
-                    <p>Total episodes: {{content.seasons.episodes}}</p>
                     <h4>Top Actors</h4>
-                    <ul class="list-group">
-                        <li class="list-group-item" v-for="actor in topActors">
-                            <b>{{actor.name}}</b> as <i>{{actor.role}}</i>
-                        </li>
-                    </ul>
+                    <div class="actors-container">
+                        <div class="actor-item" v-for="actor in topActors">
+                            <div class="actor-item__title"><b>{{actor.name}}</b> as <i>{{actor.role}}</i></div>
+                            <img class="actor-item__image" :src="actorImg(actor.image)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="episodes" class='tab-pane' role='tabpanel'>
+                <p>Total Seasons: {{content.seasons.seasons}}</p>
+                <p>Total episodes: {{content.seasons.episodes}}</p>
+                <h4>Seasons</h4>
+                <button v-for="season in seasonList" @click="bringMeSeason(season)"
+                v-bind:class="{btn: true, 'btn-season': true, 'btn-info': season === selectedSeason, 'btn-default': season !== selectedSeason }"
+                >{{season}}</button>
+                <div v-if="selectedSeason" class="mt-3">
+                    <div v-for="episode in episodes">
+                        <h5>{{ episode.episodeName }} ({{episode.firstAired}})</h5>
+                        <p>
+                            {{ episode.overview}}
+                        </p>
+                    </div>
                 </div>
             </div>
             <div id="posters" class="tab-pane" role="tabpanel">
@@ -62,12 +76,11 @@ export default {
   data() {
       return {
           postersSelected: false,
+          selectedSeason: 0,
+          episodes: null,
       }
   },
   computed: {
-      getImage() {
-          return `https://www.thetvdb.com/banners/${this.content.banner}`;
-      },
       aliases() {
           return this.content.aliases.length ? ` (AKA: ${this.content.aliases})` : '';
       },
@@ -77,14 +90,37 @@ export default {
       topPosters() {
           return this.content.posters.slice(0, 9);
       },
+      seasonList() {
+          let seasons = [];
+          for (let i=0; i < this.content.seasons.seasons; i++) {
+              seasons.push(i+1);
+          }
+          return seasons;
+      },
   },
   methods: {
       selectPosters() {
-          console.log("Selecting posters");
           this.postersSelected = true;
+      },
+      selectEpisodes() {
+          this.postersSelected = false;
       },
       selectDetails() {
           this.postersSelected = false;
+      },
+      bringMeSeason(n) {
+          $.get(`/episodes/${this.content.id}/${n}`).then((res) => {
+              if (res.success === false) {
+                  alert("Sorry, error.");
+                  return;
+              }
+
+              this.selectedSeason = n;
+              this.episodes = res.episodes;
+          });
+      },
+      actorImg(image) {
+          return `https://www.thetvdb.com/banners/_cache/${image}`;
       }
   }
 }

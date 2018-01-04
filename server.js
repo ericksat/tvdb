@@ -1,8 +1,7 @@
-// TODO: Cache keys should take aliases into consideration to reduce doubles.
 // TODO: Design update
 // TODO: Allow fetching season episodes
 // TODO: Second design pass.
-// TODO: Github!
+// TODO: Cache keys should take aliases into consideration to reduce doubles.
 // TODO: Heroku
 
 const webpack = require('webpack');
@@ -45,11 +44,11 @@ app.get('/show/:name', async (req, res) => {
     }
 });
 
-app.get('/biglist', async (req, res) => {
+app.get('/episodes/:id/:season', async (req, res) => {
     try {
-        let fetchRes = await fetcher.fetchABunch(fetcher.listFromFile(path.join(__dirname, './list.json')));
+        let fetchRes = await fetcher.fetchEpisodes(req.params.id, req.params.season);
         if (!fetchRes || fetchRes.length === 0) throw Error('Bad result or no results.');
-        res.send({ success: true, longResult: fetchRes });
+        res.send({ success: true, episodes: fetchRes });
     } catch (e) {
         res.send({ success: false, error: e.message });
     }

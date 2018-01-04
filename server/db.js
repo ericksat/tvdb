@@ -7,27 +7,27 @@ class DbCache {
     constructor() {
         this.db = lowdb(adapter);
         // Set some defaults
-        this.db.defaults({ shows: [], token: null }).write();
+        this.db.defaults({ shows: [], episodes: [], token: null }).write();
     }
 
-    get(key) {
+    get(key, collection = "shows") {
         key = key.toLowerCase();
         // console.log(`Requesting ${key}`);
-        let thingy = this.db.get('shows').find({ url: key }).value();
+        let thingy = this.db.get(collection).find({ url: key }).value();
         if (!thingy) return null;
         if (thingy.expires < Date.now()) {
             console.log(`Found ${key} but expired`);
-            this.db.get('shows').remove({url: key}).write();
+            this.db.get(collection).remove({url: key}).write();
             return null;
         }
         // console.log(`Found ${key} and returning`);
         return thingy;
     }
 
-    put(key, content, expireSeconds) {
+    put(key, content, expireSeconds, collection= "shows") {
         // console.log(`Storing ${key}`);
         let expires = Date.now() + (expireSeconds * 1000);
-        this.db.get('shows').push({ url: key.toLowerCase(), content, expires }).write();
+        this.db.get(collection).push({ url: key.toLowerCase(), content, expires }).write();
     }
 
     showGc() {
