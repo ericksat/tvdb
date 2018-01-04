@@ -1,0 +1,10 @@
+#posters>span>img {
+    display: none;
+}
+
+#posters.active>span>img {
+    display: inline-block;
+    margin: 8px;
+    border: 1px solid #808080;
+    border-radius: 16px;
+}
