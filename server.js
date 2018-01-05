@@ -1,6 +1,6 @@
-// TODO: Design update
-// TODO: Allow fetching season episodes
-// TODO: Second design pass.
+// TODO: Proper loader
+// TODO: The whole panel moves a bit sometimes when you click on different tabs. Fix that.
+// TODO: Final design update.
 // TODO: Cache keys should take aliases into consideration to reduce doubles.
 // TODO: Heroku
 
@@ -25,7 +25,7 @@ const hotMiddleware = require('webpack-hot-middleware')(compiler);
 app.use(hotMiddleware);
 
 // Static routes
-const publicPath = path.join(__dirname, './public');
+const publicPath = path.join(__dirname, './src/assets');
 app.use(express.static(publicPath));
 
 // Verify login status

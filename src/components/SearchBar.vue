@@ -15,6 +15,7 @@ export default {
     },
     methods: {
         onSubmit() {
+            this.$emit('loading');
             let searchValue = this.value;
             console.log(searchValue);
 

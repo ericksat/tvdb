@@ -20,7 +20,7 @@ class Fetcher {
         this.success = 0;
         this.failure = 0;
 
-        this.timer = setInterval(this.garbageCollector.bind(this), 300000);
+        this.timer = setInterval(this.garbageCollector.bind(this), 900000);
     }
 
     async signin() {
@@ -66,7 +66,16 @@ class Fetcher {
         const url = `${REMOTE}series/${showId}/actors`;
         // console.log("Getting actors", url);
         let response = await axios.get(url, this.getOpts());
-        return response.data.data;
+        let actors = response.data.data;
+        return actors.map(actor => {
+            return {
+                id: actor.id,
+                image: actor.image ? `https://www.thetvdb.com/banners/_cache/${actor.image}` : "/img/logo.png",
+                name: actor.name,
+                role: actor.role,
+                sortOrder: actor.sortOrder
+            };
+        });
     }
 
     async getSeasons(showId) {

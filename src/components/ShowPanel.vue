@@ -1,11 +1,17 @@
 <template>
 <div class="container-fluid" style="margin-top: 2rem">
+    <div v-if="loading">
+        Loading, please wait ...
+    </div>
     <div v-if="content" class="show-container">
         <img :src="content.banner" />
         <h3>{{content.seriesName}} {{aliases}}</h3>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" href="#details" role="tab" data-toggle="tab" @click="selectDetails">Details</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#actors" role="tab" data-toggle="tab" @click="selectActors">Actors</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#episodes" role="tab" data-toggle="tab" @click="selectEpisodes">Episodes</a>
@@ -15,113 +21,95 @@
             </li>
         </ul>
         <div class="tab-content">
-            <div id="details" class="tab-pane active" role="tabpanel">
-                <p>{{content.overview}}</p>
-                <p>
-                    First Aired: {{content.firstAired}}<br />
-                    Network: {{content.network}}<br />
-                    Status: {{content.status}}
-                </p>
-                <div>
-                    <h3>Genres</h3>
-                    <ul>
-                        <li v-for="item in content.genre">
-                            {{item}}
-                        </li>
-                    </ul>
-                    <h4>Top Actors</h4>
-                    <div class="actors-container">
-                        <div class="actor-item" v-for="actor in topActors">
-                            <div class="actor-item__title"><b>{{actor.name}}</b> as <i>{{actor.role}}</i></div>
-                            <img class="actor-item__image" :src="actorImg(actor.image)" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="episodes" class='tab-pane' role='tabpanel'>
-                <p>Total Seasons: {{content.seasons.seasons}}</p>
-                <p>Total episodes: {{content.seasons.episodes}}</p>
-                <h4>Seasons</h4>
-                <button v-for="season in seasonList" @click="bringMeSeason(season)"
-                v-bind:class="{btn: true, 'btn-season': true, 'btn-info': season === selectedSeason, 'btn-default': season !== selectedSeason }"
-                >{{season}}</button>
-                <div v-if="selectedSeason" class="mt-3">
-                    <div v-for="episode in episodes">
-                        <h5>{{ episode.episodeName }} ({{episode.firstAired}})</h5>
-                        <p>
-                            {{ episode.overview}}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div id="posters" class="tab-pane" role="tabpanel">
-                <h4>Top Posters</h4>
-                <div v-if="postersSelected">
-                    <span v-for="poster in topPosters">
-                        <img :src="poster" />
-                    </span>
-                </div>
-            </div>
+            <DetailsPanel :content="content" />
+            <ActorsPanel :actors="content.actors" :active="actorsSelected" />
+            <SeasonPanel :seasons="content.seasons" :show-id="content.id" />
+            <PostersPanel :posters="content.posters" :selected="postersSelected" />
         </div>
     </div>
 </div>
 </template>
 <script>
+import ActorsPanel from './ActorsPanel.vue';
+import DetailsPanel from './DetailsPanel.vue';
+import SeasonPanel from './SeasonPanel.vue';
+import PostersPanel from './PostersPanel.vue';
+
 export default {
   props: {
-      content: {
-          type: Object,
-      }
+      content: Object,
+      loading: Boolean,
+  },
+  components: {
+      ActorsPanel,
+      DetailsPanel,
+      SeasonPanel,
+      PostersPanel,
   },
   data() {
       return {
           postersSelected: false,
-          selectedSeason: 0,
-          episodes: null,
+          actorsSelected: false,
       }
   },
   computed: {
-      aliases() {
-          return this.content.aliases.length ? ` (AKA: ${this.content.aliases})` : '';
-      },
-      topActors() {
-          return this.content.actors.filter((actor) => actor.sortOrder <= 2);
-      },
-      topPosters() {
-          return this.content.posters.slice(0, 9);
-      },
-      seasonList() {
-          let seasons = [];
-          for (let i=0; i < this.content.seasons.seasons; i++) {
-              seasons.push(i+1);
-          }
-          return seasons;
-      },
+    aliases() {
+        return this.content.aliases.length ? ` (AKA: ${this.content.aliases})` : '';
+    },
   },
   methods: {
       selectPosters() {
           this.postersSelected = true;
+        //   this.actorsSelected = false;
+      },
+      selectActors() {
+        //   this.postersSelected = false;
+          this.actorsSelected = true;
       },
       selectEpisodes() {
-          this.postersSelected = false;
+        //   this.postersSelected = false;
+        //   this.actorsSelected = false;
       },
       selectDetails() {
+        //   this.postersSelected = false;
+        //   this.actorsSelected = false;
+      },
+  },
+  beforeUpdate() {
+      if (!this.content) { // Reset status
           this.postersSelected = false;
-      },
-      bringMeSeason(n) {
-          $.get(`/episodes/${this.content.id}/${n}`).then((res) => {
-              if (res.success === false) {
-                  alert("Sorry, error.");
-                  return;
-              }
-
-              this.selectedSeason = n;
-              this.episodes = res.episodes;
-          });
-      },
-      actorImg(image) {
-          return `https://www.thetvdb.com/banners/_cache/${image}`;
+          this.actorsSelected = false;
       }
   }
 }
 </script>
+<style>
+.actors-container {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+
+.actor-item {
+    float: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px;
+    margin: 6px;
+    border: 1px solid white;
+    border-radius: 8px;
+    background-color: #444;
+    width: 12.5rem;
+}
+
+.actor-item__title {
+    text-align: center;
+    padding-bottom: 0.5rem;
+}
+
+.actor-item__image {
+    height: 192px;
+    object-fit: cover;
+}
+</style>

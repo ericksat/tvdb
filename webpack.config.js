@@ -2,7 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 
 module.exports = {
-  entry: './src/main.js',
+  entry: ['./src/main.js'],
   output: {
     path: path.resolve(__dirname, './dist'),
     filename: 'build.js',
@@ -56,12 +56,12 @@ module.exports = {
   devtool: '#eval-source-map'
 }
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
     module.exports.plugins = [
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin()
     ];
-    // module.exports.entry.push('webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'); //?noInfo=true&quiet=true)
+    module.exports.entry.push('webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'); //?noInfo=true&quiet=true)
     // module.exports.module.rules[0].use.push({ loader: 'webpack-module-hot-accept' });
 }
 
