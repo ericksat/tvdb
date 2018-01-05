@@ -1,7 +1,8 @@
 const lowdb = require('lowdb');
 
 const FileSync = require('lowdb/adapters/FileSync')
-const adapter = new FileSync('db.json');
+const Memory = require('low/adapters/Memory')
+const adapter = process.env.NODE_ENV === 'production' ? new Memory() : new FileSync('db.json');
 
 class DbCache {
     constructor() {

@@ -4,12 +4,9 @@
 // TODO: Final design update.
 // TODO: Cache keys should take aliases into consideration to reduce doubles.
 
-//  process.env.NODE_ENV = 'production';
+// process.env.NODE_ENV = 'production';
 // console.log(process.env.NODE_ENV);
 
-const webpack = require('webpack');
-const middleware = require('webpack-dev-middleware');
-const webpackConfig = require('./webpack.config.js');
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -21,6 +18,9 @@ const port = process.env.port || 3000;
 
 // Hotloader for test environment
 if (process.env.NODE_ENV !== 'production') {
+    const webpack = require('webpack');
+    const middleware = require('webpack-dev-middleware');
+    const webpackConfig = require('./webpack.config.js');
     const compiler = webpack(webpackConfig);
     app.use(middleware(compiler, {
         publicPath: webpackConfig.output.publicPath
