@@ -14,7 +14,7 @@ const app = express();
 const { Fetcher } = require('./server/fetcher');
 let fetcher = new Fetcher();
 
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 
 // Hotloader for test environment
 if (process.env.NODE_ENV !== 'production') {
