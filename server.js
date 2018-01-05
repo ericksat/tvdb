@@ -3,31 +3,37 @@
 // TODO: Clicking on an actor should open an IMDB window.
 // TODO: Final design update.
 // TODO: Cache keys should take aliases into consideration to reduce doubles.
-// TODO: Heroku
+
+//  process.env.NODE_ENV = 'production';
+// console.log(process.env.NODE_ENV);
 
 const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
 const webpackConfig = require('./webpack.config.js');
-const compiler = webpack(webpackConfig);
 const express = require('express');
 const path = require('path');
 const app = express();
 
-// Local development
 const { Fetcher } = require('./server/fetcher');
 let fetcher = new Fetcher();
 
 const port = process.env.port || 3000;
 
-app.use(middleware(compiler, {
-    publicPath: webpackConfig.output.publicPath
-}));
-const hotMiddleware = require('webpack-hot-middleware')(compiler);
-app.use(hotMiddleware);
+// Hotloader for test environment
+if (process.env.NODE_ENV !== 'production') {
+    const compiler = webpack(webpackConfig);
+    app.use(middleware(compiler, {
+        publicPath: webpackConfig.output.publicPath
+    }));
+    const hotMiddleware = require('webpack-hot-middleware')(compiler);
+    app.use(hotMiddleware);
+}
 
 // Static routes
-const publicPath = path.join(__dirname, './src/assets');
-app.use(express.static(publicPath));
+app.use(express.static(path.join(__dirname, './src/assets')));
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, './dist')));
+}
 
 // Verify login status
 app.use(fetcher.verifyValidToken.bind(fetcher));
