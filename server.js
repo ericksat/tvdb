@@ -1,5 +1,6 @@
 // TODO: Proper loader
-// TODO: The whole panel moves a bit sometimes when you click on different tabs. Fix that.
+// TODO: Clicking on an image should display it over the entire posters panel.
+// TODO: Clicking on an actor should open an IMDB window.
 // TODO: Final design update.
 // TODO: Cache keys should take aliases into consideration to reduce doubles.
 // TODO: Heroku

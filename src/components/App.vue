@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Search the TVDB</h1>
+    <h1 class="top-title">Search the TVDB</h1>
     <SearchBar @update="updateContent" @loading="setLoading" />
     <ShowPanel :content="content" :loading="loading" />
   </div>
@@ -32,4 +32,8 @@ export default {
   },
 }
 </script>
-
+<style>
+.top-title {
+    margin: 1rem 0;
+}
+</style>

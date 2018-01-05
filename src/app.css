@@ -1,14 +1,3 @@
-#posters img {
-    display: none;
-}
-
-#posters.active img {
-    display: inline-block;
-    margin: 8px;
-    border: 1px solid #808080;
-    border-radius: 16px;
-}
-
 .btn-season {
     margin: 0 2px;
     width: 44px;
@@ -16,4 +5,8 @@
 
 .tab-content {
     padding: 0.5rem 0 0 0.5rem;
+}
+
+body {
+    overflow-y: scroll;
 }

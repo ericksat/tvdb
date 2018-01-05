@@ -16,9 +16,30 @@ export default {
     },
     computed: {
         topPosters() {
-          return this.posters.slice(0, 8);
+          return this.posters.slice(0, 10);
         },
     },
 }
 </script>
+<style>
+#posters img {
+    display: inline-block;
+    margin: 8px;
+    border: 1px solid #808080;
+    border-radius: 16px;
+    width: 128px;
+}
+
+@media screen and (min-width: 600px) {
+    #posters img {
+        width: 192px;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    #posters img {
+        width: 256px;
+    }
+}
+</style>
 

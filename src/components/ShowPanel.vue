@@ -1,11 +1,11 @@
 <template>
-<div class="container-fluid" style="margin-top: 2rem">
+<div style="margin-top: 2rem">
     <div v-if="loading">
         Loading, please wait ...
     </div>
     <div v-if="content" class="show-container">
-        <img :src="content.banner" />
-        <h3>{{content.seriesName}} {{aliases}}</h3>
+        <img :src="content.banner" class="show__banner" />
+        <h3 class="show__title">{{content.seriesName}} {{aliases}}</h3>
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" href="#details" role="tab" data-toggle="tab" @click="selectDetails">Details</a>
@@ -84,6 +84,14 @@ export default {
 }
 </script>
 <style>
+.show__banner {
+    width: 100%;
+}
+
+.show__title {
+    margin: 1rem 0;
+}
+
 .actors-container {
     display: flex;
     flex-flow: row;
