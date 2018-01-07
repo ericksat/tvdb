@@ -1,7 +1,7 @@
 <template>
 <div style="margin-top: 2rem">
-    <div v-if="loading">
-        Loading, please wait ...
+    <div v-if="loading" class="loader__container">
+        <div class="loader"></div>
     </div>
     <div v-if="content" class="show-container">
         <img :src="content.banner" class="show__banner" />
@@ -90,34 +90,5 @@ export default {
 
 .show__title {
     margin: 1rem 0;
-}
-
-.actors-container {
-    display: flex;
-    flex-flow: row;
-    flex-wrap: wrap;
-}
-
-.actor-item {
-    float: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 8px;
-    margin: 6px;
-    border: 1px solid white;
-    border-radius: 8px;
-    background-color: #444;
-    width: 12.5rem;
-}
-
-.actor-item__title {
-    text-align: center;
-    padding-bottom: 0.5rem;
-}
-
-.actor-item__image {
-    height: 192px;
-    object-fit: cover;
 }
 </style>

@@ -13,22 +13,22 @@
         </li>
     </ul>
     <h4>Top Actors</h4>
-    <div class="actors-container">
-        <div class="actor-item" v-for="actor in topActors" :key="actor.id">
-            <div class="actor-item__title"><b>{{actor.name}}</b><br><i>{{actor.role}}</i></div>
-            <img v-if="actor.image.length > 0" class="actor-item__image" :src="actor.image" />
-        </div>
-    </div>
+    <ActorsList :actors="topActors" />
 </div>
 </template>
 <script>
+import ActorsList from './ActorsList.vue';
+
 export default {
     props: {
         content: Object
     },
+    components: {
+        ActorsList
+    },
     computed: {
         topActors() {
-            return this.content.actors.filter((actor) => actor.sortOrder <= 3).slice(0, 3);
+            return this.content.actors.filter((actor) => actor.sortOrder <= 3).slice(0, 4);
         },
     }
 }

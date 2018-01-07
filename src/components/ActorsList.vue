@@ -1,0 +1,63 @@
+<template>
+<div class="actors-container">
+    <div class="actor-item" v-for="actor in actors" :key="actor.id">
+        <div class="actor-item__name"><a :href="linko(actor.name)" target="_blank">{{actor.name}}</a></div>
+        <div class="actor-item__role">{{actor.role}}</div>
+        <img v-if="actor.image.length > 0" class="actor-item__image" :src="actor.image" />
+    </div>
+</div>
+</template>
+<script>
+export default {
+    props: {
+        actors: Array
+    },
+    methods: {
+        linko(name) {
+            return `http://www.imdb.com/find?s=nm&q=${name}`;
+        }
+    }
+}
+</script>
+<style>
+.actors-container {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+
+.actor-item {
+    float: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8px;
+    margin: 6px;
+    border: 1px solid white;
+    border-radius: 8px;
+    background-color: #444;
+    width: 12.5rem;
+}
+
+.actor-item__name {
+    text-align: center;
+    font-weight: bold;
+}
+
+.actor-item__name a {
+    color: white;
+}
+
+.actor-item__role {
+    text-align: center;
+    padding-bottom: 0.5rem;
+    font-style: italic;
+    max-height: 70px;
+    overflow: hidden;
+}
+
+.actor-item__image {
+    height: 192px;
+    object-fit: cover;
+}
+</style>

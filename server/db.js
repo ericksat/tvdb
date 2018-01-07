@@ -42,10 +42,11 @@ class DbCache {
         if (token == null) {
             token = {
                 content: "",
-                expiration: 0
+                expires: 0
             }
         }
-        token.expired = token.expiration < Date.now();
+        token.expired = token.expires < Date.now();
+        // console.log(`Token expiration ${token.expires} vs now ${Date.now()}`)
         return token;
     }
 

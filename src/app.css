@@ -10,3 +10,25 @@
 body {
     overflow-y: scroll;
 }
+
+/* Loader */
+.loader {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 4s linear infinite;
+    border-top: 16px solid white;
+    border-right: 16px solid lightblue;
+    border-bottom: 16px solid white;
+    border-left: 16px solid lightblue;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader__container {
+    position: relative;
+    top: -1.5rem;
+}

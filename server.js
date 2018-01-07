@@ -1,6 +1,5 @@
-// TODO: Proper loader
 // TODO: Clicking on an image should display it over the entire posters panel.
-// TODO: Clicking on an actor should open an IMDB window.
+// TODO: Posters should have an infinity-scroll type pagination
 // TODO: Final design update.
 // TODO: Cache keys should take aliases into consideration to reduce doubles.
 

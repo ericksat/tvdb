@@ -15,17 +15,17 @@ export default {
     },
     methods: {
         onSubmit() {
-            this.$emit('loading');
-            let searchValue = this.value;
-            console.log(searchValue);
+            let searchValue = this.value.trim();
+            if (searchValue.length === 0) return;
 
+            this.$emit('loading');
             this.findShow(searchValue);
         },
         findShow(value) {
             let finalValue = encodeURIComponent(value);
             $.get(`/show/${finalValue}`).then((res) => {
                 if (res.error) {
-                    alert(res.error);
+                    this.$emit('error', res.error);
                     return;
                 }
                 this.$emit('update', res);

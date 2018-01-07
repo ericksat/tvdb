@@ -16,10 +16,6 @@ class Fetcher {
             'Accept': 'application/json',
         };
         // console.log("Called fetcher constructor");
-
-        this.success = 0;
-        this.failure = 0;
-
         this.timer = setInterval(this.garbageCollector.bind(this), 900000);
     }
 
@@ -70,11 +66,13 @@ class Fetcher {
         return actors.map(actor => {
             return {
                 id: actor.id,
-                image: actor.image ? `https://www.thetvdb.com/banners/_cache/${actor.image}` : "/img/logo.png",
+                image: actor.image ? `https://www.thetvdb.com/banners/${actor.image}` : "/img/logo.png",
                 name: actor.name,
                 role: actor.role,
                 sortOrder: actor.sortOrder
             };
+        }).sort((a, b) => {
+            return a.sortOrder - b.sortOrder;
         });
     }
 
@@ -117,7 +115,6 @@ class Fetcher {
         let data = cache.get(key);
         if (data) {
             // console.log(`Returning cached ${key}`);
-            this.success++;
             return data.content;
         }
 
@@ -139,11 +136,13 @@ class Fetcher {
             // console.log("final data", data);
             // console.log("Cached " + url);
             cache.put(key, data, CACHE_DEFAULT);
-            this.success++;
         } catch (e) {
             console.log(`Failed to fetch ${url}`, e.message);
-            cache.put(key, {error: "No fetchy"}, CACHE_DEFAULT); // I will use this to remove entries from lists
-            this.failure++;
+            if (e.message.indexOf('code 404') !== -1) {
+                let errText = `Could not find any TV show matching ${name}`;
+                cache.put(key, { error: errText}, CACHE_DEFAULT); // I will use this to remove entries from lists
+                throw new Error(errText);
+            }
             throw e;
         }
 
