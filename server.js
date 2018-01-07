@@ -1,4 +1,4 @@
-// TODO: Clicking on an image should display it over the entire posters panel.
+// TODO: Vue Route so we can go back-forward between searches.
 // TODO: Posters should have an infinity-scroll type pagination
 // TODO: Final design update.
 // TODO: Cache keys should take aliases into consideration to reduce doubles.
