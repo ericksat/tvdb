@@ -3,7 +3,7 @@
     <div v-if="loading" class="loader__container">
         <div class="loader"></div>
     </div>
-    <div v-if="content" class="show-container">
+    <div v-if="content" class="show__container">
         <img :src="content.banner" class="show__banner" />
         <h3 class="show__title">{{content.seriesName}} {{aliases}}</h3>
         <ul class="nav nav-tabs" role="tablist">
@@ -84,6 +84,10 @@ export default {
 }
 </script>
 <style>
+.show__container {
+    padding-bottom: 2.5rem; /* To adjust for footer */
+}
+
 .show__banner {
     width: 100%;
 }
