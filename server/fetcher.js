@@ -136,6 +136,7 @@ class Fetcher {
             // console.log("final data", data);
             // console.log("Cached " + url);
             cache.put(key, data, CACHE_DEFAULT);
+            cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
         } catch (e) {
             console.log(`Failed to fetch ${url}`, e.message);
             if (e.message.indexOf('code 404') !== -1) {
@@ -210,6 +211,10 @@ class Fetcher {
      */
     garbageCollector() {
         cache.showGc();
+    }
+
+    fetchSuggestions(filter) {
+        return cache.getSuggestions(filter)
     }
 }
 

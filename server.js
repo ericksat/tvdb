@@ -60,6 +60,11 @@ app.get('/episodes/:id/:season', async (req, res) => {
     }
 });
 
+app.get('/suggestions/:query', (req, res) => {
+    let suggestions = fetcher.fetchSuggestions(req.params.query.trim());
+    res.send({success: true, suggestions});
+});
+
 app.get('/login', async (req, res) => {
     try {
         let fetchRes = await fetcher.signin();
@@ -67,7 +72,6 @@ app.get('/login', async (req, res) => {
     } catch (e) {
         res.send({ success: false, error: e.message });
     }
-
 });
 
 app.listen(port, () => {

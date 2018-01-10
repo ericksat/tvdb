@@ -8,7 +8,7 @@ class DbCache {
     constructor() {
         this.db = lowdb(adapter);
         // Set some defaults
-        this.db.defaults({ shows: [], episodes: [], token: null }).write();
+        this.db.defaults({ shows: [], episodes: [], suggestions: [], token: null }).write();
     }
 
     get(key, collection = "shows") {
@@ -57,6 +57,14 @@ class DbCache {
             expires: Date.now() + (expireSeconds * 1000)
         }
         this.db.set('token', token).write()
+    }
+
+    getSuggestions(filter) {
+        return this.db.get('suggestions').filter((one) => one.indexOf(filter) === 0).value();
+    }
+
+    addSuggestion(value) {
+        this.db.get('suggestions').push(value).write();
     }
 }
 
