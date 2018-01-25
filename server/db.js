@@ -76,6 +76,29 @@ class DbCache {
             collection.push(value).write();
         }
     }
+
+    getByAlias(alias) {
+        alias = alias.toLowerCase();
+        // console.log(`Requesting ${key}`);
+        let allShows = this.db.get("shows").value();
+        for (let show of allShows) {
+            if (!show.content.aliases || show.content.aliases.length === 0) continue;
+            for (let item of show.content.aliases) {
+                if (item.toLowerCase() === alias) {
+                    if (show.expires < Date.now()) {
+                        console.log(`Found alias ${alias} but expired`);
+                        this.db.get("shows").remove({ url: show.url }).write();
+                        return null;
+                    } else {
+                        console.log(`Found alias ${alias}.`);
+                        return show;
+                    }
+                }
+            }
+        }
+        // Did not find alias
+        return null;
+    }
 }
 
 module.exports = new DbCache();

@@ -1,5 +1,6 @@
+// TODO: db "cache" name should be changed to something that better defines it.
+// TODO: Improve search by alias and seriesname through an index that maps them to proper keys (not just url as key)
 // TODO: Final design update.
-// TODO: Cache keys should take aliases into consideration to reduce doubles.
 
 // process.env.NODE_ENV = 'production';
 // console.log(process.env.NODE_ENV);

@@ -55,7 +55,12 @@ class Fetcher {
 
     getCached(name) {
         const key = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
-        return cache.get(key);
+        let obvious = cache.get(key);
+        if (obvious) return obvious;
+        // Try aliases
+        let optional = cache.getByAlias(name);
+        if (optional) return optional;
+        return null;
     }
 
     async getActors(showId) {
@@ -112,7 +117,7 @@ class Fetcher {
         const urlExtra = `${REMOTE}series/`;
         let key = url;
         // Try cache first
-        let data = cache.get(key);
+        let data = this.getCached(name);
         if (data) {
             // console.log(`Returning cached ${key}`);
             cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
