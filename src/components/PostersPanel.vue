@@ -7,9 +7,8 @@
                 <img :src="poster" @click="choosePoster(poster)" />
             </span>
         </div>
-        <div class="posters__big" v-if="chosenPoster">
-            <button class="btn btn-info" @click="choosePoster(null)">Back</button>
-            <img :src="chosenPoster" />
+        <div class="posters__big" v-if="chosenPoster" @click="choosePoster(null)">
+            <img :src="chosenPoster" class="clickable" />
         </div>
     </div>
 </div>
@@ -23,11 +22,13 @@ export default {
     data() {
         return {
             chosenPoster: null,
+            loadedPosters: 12,
+            busy: false,
         }
     },
     computed: {
         topPosters() {
-          return this.posters.slice(0, 10);
+          return this.posters.slice(0, this.loadedPosters);
         },
     },
     methods: {
@@ -35,9 +36,41 @@ export default {
             if (src !== null) {
                 src = src.replace(/_cache\//, "");
             }
-            this.chosenPoster = src;
+            if (this.chosenPoster !== src) {
+                this.chosenPoster = src;
+            }
+        },
+        handleScroll: function () {
+            if (!this.selected || this.busy) return;
+            // this.scrollPos = document.body.scrollHeight - window.innerHeight - document.body.scrollTop;
+            // let res = document.body.scrollHeight - window.innerHeight - window.scrollY;
+            let res = $(document).height() - $(window).height() - $(window).scrollTop();
+            // console.log(res);
+            if (res <= 2) {
+                if (this.posters.length <= this.loadedPosters) {
+                    return;
+                }
+                this.loadedPosters += 4;
+                this.busy = true; // Tiny throttling to prevent double triggering
+                // console.log("Scrolled to bottom, loaded posters = " + this.loadedPosters);
+                setTimeout(() => this.busy = false, 250);
+            }
         }
-    }
+    },
+    watch: {
+        posters(newValue) { // Update search value from parent.
+            // console.log("Supervalue updated to " + newValue);
+            this.loadedPosters = 12; // Reset that.
+        },
+    },
+    mounted: function () {
+        // console.log("Created scroll");
+        window.addEventListener('scroll', this.handleScroll)
+    },
+    destroyed: function () {
+        // console.log("Removed scroll");
+        window.removeEventListener('scroll', this.handleScroll)
+    },
 }
 </script>
 <style>
