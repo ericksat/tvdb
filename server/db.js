@@ -8,17 +8,17 @@ class DbCache {
     constructor() {
         this.db = lowdb(adapter);
         // Set some defaults
-        this.db.defaults({ shows: [], episodes: [], suggestions: [], token: null }).write();
+        this.db.defaults({ shows: [], episodes: [], suggestions: [], showsIndex: [], token: null }).write();
     }
 
     get(key, collection = "shows") {
         key = key.toLowerCase();
         // console.log(`Requesting ${key}`);
-        let thingy = this.db.get(collection).find({ url: key }).value();
+        let thingy = this.db.get(collection).find({ id: key }).value();
         if (!thingy) return null;
         if (thingy.expires < Date.now()) {
             console.log(`Found ${key} but expired`);
-            this.db.get(collection).remove({url: key}).write();
+            this.db.get(collection).remove({id: key}).write();
             return null;
         }
         // console.log(`Found ${key} and returning`);
@@ -28,7 +28,7 @@ class DbCache {
     put(key, content, expireSeconds, collection= "shows") {
         // console.log(`Storing ${key}`);
         let expires = Date.now() + (expireSeconds * 1000);
-        this.db.get(collection).push({ url: key.toLowerCase(), content, expires }).write();
+        this.db.get(collection).push({ id: key.trim().toLowerCase(), content, expires }).write();
     }
 
     showGc() {
@@ -77,7 +77,7 @@ class DbCache {
         }
     }
 
-    getByAlias(alias) {
+/*    getByAlias(alias) {
         alias = alias.toLowerCase();
         // console.log(`Requesting ${key}`);
         let allShows = this.db.get("shows").value();
@@ -98,6 +98,17 @@ class DbCache {
         }
         // Did not find alias
         return null;
+    } */
+
+    updateIndex(key, value) {
+        // See if exists
+        key = key.trim().toLowerCase();
+        this.db.set(`showsIndex[${key}]`, value).write();
+    }
+
+    getIndex(key) {
+        key = key.trim().toLowerCase();
+        return this.db.get(`showsIndex[${key}]`).value() || null;
     }
 }
 

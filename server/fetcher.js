@@ -54,13 +54,53 @@ class Fetcher {
     }
 
     getCached(name) {
-        const key = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
-        let obvious = cache.get(key);
-        if (obvious) return obvious;
-        // Try aliases
-        let optional = cache.getByAlias(name);
-        if (optional) return optional;
-        return null;
+        try {
+            // const key = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
+            let key = name.trim().toLowerCase();
+            // Check in index
+            let indexedKey = cache.getIndex(key);
+            if (indexedKey) {
+                console.log("Returning indexed key " + indexedKey);
+                return cache.get(indexedKey);
+            }
+            return cache.get(key);
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+    }
+
+    /**
+     * Keys a show and its aliases into cache and index
+     *
+     * @param {Array} data
+     */
+    putInCache(name, data) {
+        console.log("Putting in cache");
+        if (data.error) {
+            console.log("Error put")
+            cache.put(name.trim().toLowerCase(), data, CACHE_DEFAULT);
+        }
+        try {
+            let key = data.seriesName ? data.seriesName.trim().toLowerCase() : name.trim().toLowerCase();
+            console.log("Putting some key " + key);
+            cache.put(key, data, CACHE_DEFAULT);
+            console.log("Now indexes");
+            // Update index
+            let indexEntries = [name];
+            if (data.aliases && data.aliases.length > 0) {
+                for (let alias of data.aliases) {
+                    indexEntries.push(alias);
+                }
+            }
+            // Insert or replace all values in index
+            for (let entry of indexEntries) {
+                cache.updateIndex(entry, key);
+            }
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
     }
 
     async getActors(showId) {
@@ -113,9 +153,6 @@ class Fetcher {
     }
 
     async show(name) {
-        const url = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
-        const urlExtra = `${REMOTE}series/`;
-        let key = url;
         // Try cache first
         let data = this.getCached(name);
         if (data) {
@@ -123,9 +160,12 @@ class Fetcher {
             cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
             return data.content;
         }
-
         // console.log(`Did not find ${key} in cache.`);
+
+        // Go to remote
         try {
+            const url = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
+            const urlExtra = `${REMOTE}series/`;
             const opts = this.getOpts();
             let response = await axios.get(url, opts);
             // We only want the first response right now, for brevity
@@ -141,13 +181,13 @@ class Fetcher {
             data.banner = `https://www.thetvdb.com/banners/${data.banner}`;
             // console.log("final data", data);
             // console.log("Cached " + url);
-            cache.put(key, data, CACHE_DEFAULT);
+            this.putInCache(name, data);
             cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
         } catch (e) {
             console.log(`Failed to fetch ${url}`, e.message);
             if (e.message.indexOf('code 404') !== -1) {
                 let errText = `Could not find any TV show matching ${name}`;
-                cache.put(key, { error: errText}, CACHE_DEFAULT); // I will use this to remove entries from lists
+                this.putInCache(name, {error: errText}); // Keeping this result in cache would save on useless future searches
                 throw new Error(errText);
             }
             throw e;

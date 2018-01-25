@@ -1,5 +1,5 @@
 // TODO: db "cache" name should be changed to something that better defines it.
-// TODO: Improve search by alias and seriesname through an index that maps them to proper keys (not just url as key)
+// TODO: Improve show-index related code to be more readable, less repeats of trim-tolowercase
 // TODO: Final design update.
 
 // process.env.NODE_ENV = 'production';
