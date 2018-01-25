@@ -1,5 +1,5 @@
 const axios = require('axios');
-const cache = require('./db');
+const db = require('./db');
 const fs = require('fs');
 
 const APIKEY = 'F23C95D5D38FE20E';
@@ -32,7 +32,7 @@ class Fetcher {
         let body = response.data;
         console.log(body);
         token.content = body.token;
-        cache.putToken(token.content);
+        db.putToken(token.content);
         return body;
     }
 
@@ -50,7 +50,7 @@ class Fetcher {
         let url = "https://api.thetvdb.com/refresh_token";
         let response = await axios.get(url, this.getOpts());
         token.content = response.data.token;
-        cache.putToken(token.content);
+        db.putToken(token.content);
     }
 
     getCached(name) {
@@ -58,12 +58,12 @@ class Fetcher {
             // const key = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
             let key = name.trim().toLowerCase();
             // Check in index
-            let indexedKey = cache.getIndex(key);
+            let indexedKey = db.getIndex(key);
             if (indexedKey) {
                 console.log("Returning indexed key " + indexedKey);
-                return cache.get(indexedKey);
+                return db.get(indexedKey);
             }
-            return cache.get(key);
+            return db.get(key);
         } catch (e) {
             console.log(e);
             throw e;
@@ -79,12 +79,12 @@ class Fetcher {
         console.log("Putting in cache");
         if (data.error) {
             console.log("Error put")
-            cache.put(name.trim().toLowerCase(), data, CACHE_DEFAULT);
+            db.put(name.trim().toLowerCase(), data, CACHE_DEFAULT);
         }
         try {
             let key = data.seriesName ? data.seriesName.trim().toLowerCase() : name.trim().toLowerCase();
             console.log("Putting some key " + key);
-            cache.put(key, data, CACHE_DEFAULT);
+            db.put(key, data, CACHE_DEFAULT);
             console.log("Now indexes");
             // Update index
             let indexEntries = [name];
@@ -95,7 +95,7 @@ class Fetcher {
             }
             // Insert or replace all values in index
             for (let entry of indexEntries) {
-                cache.updateIndex(entry, key);
+                db.updateIndex(entry, key);
             }
         } catch (e) {
             console.log(e);
@@ -157,10 +157,10 @@ class Fetcher {
         let data = this.getCached(name);
         if (data) {
             // console.log(`Returning cached ${key}`);
-            cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
+            db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
             return data.content;
         }
-        // console.log(`Did not find ${key} in cache.`);
+        // console.log(`Did not find ${key} in db.`);
 
         // Go to remote
         try {
@@ -182,7 +182,7 @@ class Fetcher {
             // console.log("final data", data);
             // console.log("Cached " + url);
             this.putInCache(name, data);
-            cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
+            db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
         } catch (e) {
             console.log(`Failed to fetch ${url}`, e.message);
             if (e.message.indexOf('code 404') !== -1) {
@@ -206,7 +206,7 @@ class Fetcher {
      */
     async verifyValidToken(req, res, next) {
         // Get the token (notice the module variable, not class variable)
-        token = cache.getToken();
+        token = db.getToken();
         // console.log("Token = ", token);
         // Check expiration
         if (token && !token.expired) {
@@ -239,7 +239,7 @@ class Fetcher {
         const url = `${REMOTE}series/${showId}/episodes/query?airedSeason=${season}`;
         let key = `${showId}_episodes_${season}`
         // Try cache first
-        let data = cache.get(key, "episodes");
+        let data = db.get(key, "episodes");
         if (data) {
             console.log(`Returning cached ${key}`);
             return data.content;
@@ -248,7 +248,7 @@ class Fetcher {
         // console.log("Getting actors", url);
         let response = await axios.get(url, this.getOpts());
         let final = response.data.data;
-        cache.put(key, final, CACHE_DEFAULT, 'episodes');
+        db.put(key, final, CACHE_DEFAULT, 'episodes');
         return final;
     }
 
@@ -256,11 +256,11 @@ class Fetcher {
      * Run this periodically to remove old entries from the fucking db
      */
     garbageCollector() {
-        cache.showGc();
+        db.showGc();
     }
 
     fetchSuggestions(filter) {
-        return cache.getSuggestions(filter)
+        return db.getSuggestions(filter)
     }
 }
 

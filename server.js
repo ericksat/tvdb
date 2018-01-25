@@ -1,4 +1,3 @@
-// TODO: db "cache" name should be changed to something that better defines it.
 // TODO: Improve show-index related code to be more readable, less repeats of trim-tolowercase
 // TODO: Final design update.
 
