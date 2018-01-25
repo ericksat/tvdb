@@ -15,12 +15,13 @@ import _ from 'lodash';
 export default {
     props: {
         superValue: String,
+        suggestions: Array
     },
     data() {
         return {
             value: "",
             request: null,
-            suggestions: []
+            // suggestions: []
         }
     },
     methods: {
@@ -40,7 +41,7 @@ export default {
                     this.$emit('error', res.error);
                     return;
                 }
-                this.$emit('update', res);
+                this.$emit('update', res, value);
             });
         },
         findSuggestions: _.throttle(function() {
@@ -68,9 +69,9 @@ export default {
                 this.onSubmit();
             }
         },
-        value(newValue) { // Local search value
-            this.findSuggestions();
-        }
+        // value(newValue) { // Local search value
+        //     this.findSuggestions();
+        // }
     }
 }
 </script>

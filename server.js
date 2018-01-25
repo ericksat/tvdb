@@ -65,6 +65,11 @@ app.get('/suggestions/:query', (req, res) => {
     res.send({success: true, suggestions});
 });
 
+app.get('/suggestions', (req, res) => {
+    let suggestions = fetcher.fetchSuggestions();
+    res.send({ success: true, suggestions });
+});
+
 app.get('/login', async (req, res) => {
     try {
         let fetchRes = await fetcher.signin();

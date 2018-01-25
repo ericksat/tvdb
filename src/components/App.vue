@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h1 class="top-title">Search the TVDB</h1>
-    <SearchBar :super-value="currentSearch" @update="updateContent" @loading="setLoading" @error="searchError" />
+    <SearchBar :super-value="currentSearch" @update="updateContent" @loading="setLoading" @error="searchError" :suggestions="suggestions" />
     <div v-if="error" class="alert alert-danger mt-2">Error: {{error}}</div>
     <ShowPanel :content="content" :loading="loading" v-if="!error" />
     <Footer />
@@ -19,13 +19,19 @@ export default {
             loading: false,
             error: null,
             currentSearch: "",
+            suggestions: [],
         }
     },
     methods: {
-      updateContent(newContent) {
+      updateContent(newContent, searchValue) {
         this.loading = false; // Content finished loading
         this.content = newContent;
         this.error = null;
+        if (this.suggestions.indexOf(searchValue) == -1) {
+            console.log("New search value " + searchValue);
+            this.suggestions.push(searchValue);
+        }
+        this.currentSearch = "";
       },
       setLoading(searchValue) { // Set state to loading
           this.loading = status;
@@ -57,6 +63,12 @@ export default {
         if (window.location.hash.length > 1) {
             this.hashBro();
         }
+
+        $.get(`/suggestions`).then((res) => {
+            if (res.success) {
+                this.suggestions = res.suggestions;
+            }
+        });
     }
 }
 </script>

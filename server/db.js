@@ -60,11 +60,21 @@ class DbCache {
     }
 
     getSuggestions(filter) {
+        if (!filter) {
+            return this.db.get('suggestions').value();
+        } // Else filter
         return this.db.get('suggestions').filter((one) => one.indexOf(filter) === 0).value();
     }
 
     addSuggestion(value) {
-        this.db.get('suggestions').push(value).write();
+        // Make sure it doesn't exist yet
+        let collection = this.db.get('suggestions');
+        let exist = collection.filter((one) => one === value).size().value();
+        // console.log(exist);
+        if (!exist) {
+            // console.log("Adding suggestion " + value);
+            collection.push(value).write();
+        }
     }
 }
 

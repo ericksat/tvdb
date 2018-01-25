@@ -5,7 +5,7 @@ const fs = require('fs');
 const APIKEY = 'F23C95D5D38FE20E';
 const REMOTE = 'https://api.thetvdb.com/';
 const REMOTE_PUBLIC = 'https://www.thetvdb.com/';
-const CACHE_DEFAULT = 18000; // In seconds
+const CACHE_DEFAULT = 3600 * 24; // In seconds
 
 let token;
 
@@ -115,6 +115,7 @@ class Fetcher {
         let data = cache.get(key);
         if (data) {
             // console.log(`Returning cached ${key}`);
+            cache.addSuggestion(name.trim()); // A successful result will be used in future suggestions
             return data.content;
         }
 

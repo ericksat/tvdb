@@ -3,8 +3,8 @@
     <p>{{content.overview}}</p>
     <p>
         First Aired: {{content.firstAired}}<br />
-        Network: {{content.network}}<br />
-        Status: {{content.status}}
+        Rating: {{content.siteRating}}<br />
+        Network: {{content.network}}, Status: {{content.status}}
     </p>
     <h3>Genres</h3>
     <ul>
