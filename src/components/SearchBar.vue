@@ -10,12 +10,12 @@
     </form>
 </template>
 <script>
-import _ from 'lodash';
+// import _ from 'lodash';
+import {mapGetters} from 'vuex';
 
 export default {
     props: {
         superValue: String,
-        suggestions: Array
     },
     data() {
         return {
@@ -24,12 +24,18 @@ export default {
             // suggestions: []
         }
     },
+    computed: {
+        ...mapGetters({
+            suggestions: "suggestions",
+            searchValue: "currentSearch"
+        })
+    },
     methods: {
         onSubmit() {
             let searchValue = this.value.trim();
             if (searchValue.length === 0) return;
 
-            this.$emit('loading', searchValue);
+            this.$store.commit('newSearch', searchValue);
             this.findShow(searchValue);
         },
         findShow(value) {
@@ -38,25 +44,25 @@ export default {
             this.request.then((res) => {
                 this.request = null; // Done;
                 if (res.error) {
-                    this.$emit('error', res.error);
+                    this.$store.commit('searchError', res.error);
                     return;
                 }
-                this.$emit('update', res, value);
+                this.$store.dispatch('updateContent', { newContent: res, searchValue: value} );
             });
         },
-        findSuggestions: _.throttle(function() {
-            let query = encodeURIComponent(this.value.trim());
-            if (query.length < 2) return;
-            let request = $.get(`/suggestions/${query.substr(0,2)}`);
-            request.then((res) => {
-                if (res.success) {
-                    this.suggestions = res.suggestions;
-                }
-            });
-        }, 1000)
+        // findSuggestions: _.throttle(function() {
+        //     let query = encodeURIComponent(this.value.trim());
+        //     if (query.length < 2) return;
+        //     let request = $.get(`/suggestions/${query.substr(0,2)}`);
+        //     request.then((res) => {
+        //         if (res.success) {
+        //             this.suggestions = res.suggestions;
+        //         }
+        //     });
+        // }, 1000)
     },
     watch: {
-        superValue(newValue) { // Update search value from parent.
+        searchValue(newValue) { // Update search value from parent.
             // console.log("Supervalue updated to " + newValue);
             if (newValue !== this.value) {
                 if (this.request) {
@@ -69,9 +75,6 @@ export default {
                 this.onSubmit();
             }
         },
-        // value(newValue) { // Local search value
-        //     this.findSuggestions();
-        // }
     }
 }
 </script>

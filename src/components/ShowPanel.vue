@@ -34,11 +34,10 @@ import ActorsPanel from './ActorsPanel.vue';
 import DetailsPanel from './DetailsPanel.vue';
 import SeasonPanel from './SeasonPanel.vue';
 import PostersPanel from './PostersPanel.vue';
+import {mapGetters} from 'vuex';
 
 export default {
   props: {
-      content: Object,
-      loading: Boolean,
   },
   components: {
       ActorsPanel,
@@ -56,6 +55,10 @@ export default {
     aliases() {
         return this.content.aliases.length ? ` (AKA: ${this.content.aliases})` : '';
     },
+    ...mapGetters({
+        content: "content",
+        loading: "loading",
+    }),
   },
   methods: {
       selectPosters() {
