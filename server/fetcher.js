@@ -60,7 +60,7 @@ class Fetcher {
             // Check in index
             let indexedKey = db.getIndex(key);
             if (indexedKey) {
-                console.log("Returning indexed key " + indexedKey);
+                // console.log("Returning indexed key " + indexedKey);
                 return db.get(indexedKey);
             }
             return db.get(key);
@@ -76,16 +76,16 @@ class Fetcher {
      * @param {Array} data
      */
     putInCache(name, data) {
-        console.log("Putting in cache");
+        // console.log("Putting in cache");
         if (data.error) {
-            console.log("Error put")
+            console.log("Error during putInCache")
             db.put(name.trim().toLowerCase(), data, CACHE_DEFAULT);
         }
         try {
             let key = data.seriesName ? data.seriesName.trim().toLowerCase() : name.trim().toLowerCase();
-            console.log("Putting some key " + key);
+            // console.log("Putting some key " + key);
             db.put(key, data, CACHE_DEFAULT);
-            console.log("Now indexes");
+            // console.log("Now indexes");
             // Update index
             let indexEntries = [name];
             if (data.aliases && data.aliases.length > 0) {
@@ -156,23 +156,25 @@ class Fetcher {
         // Try cache first
         let data = this.getCached(name);
         if (data) {
-            // console.log(`Returning cached ${key}`);
+            // console.log(`Returning cached ${name}`);
             db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
             return data.content;
         }
-        // console.log(`Did not find ${key} in db.`);
+        // console.log(`Did not find ${name} in db.`);
 
         // Go to remote
+        const url = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
         try {
-            const url = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
             const urlExtra = `${REMOTE}series/`;
             const opts = this.getOpts();
+            // console.log("Contacting remote " + url);
             let response = await axios.get(url, opts);
+            // console.log(response);
             // We only want the first response right now, for brevity
             data = response.data.data.length ? response.data.data[0] : null;
             let showId = data.id
             // Get fuller data
-            console.log("Extra url = ", urlExtra + showId);
+            // console.log("Extra url = ", urlExtra + showId);
             let extra = await axios.get(urlExtra + showId, opts);
             data = Object.assign(data, extra.data.data);
             data.actors = await this.getActors(showId);
