@@ -64,6 +64,7 @@ export default {
     watch: {
         searchValue(newValue) { // Update search value from parent.
             // console.log("Supervalue updated to " + newValue);
+            newValue = decodeURIComponent(newValue)
             if (newValue !== this.value) {
                 if (this.request) {
                     // console.log("Aborting call");
