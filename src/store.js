@@ -40,9 +40,11 @@ export const store = new Vuex.Store({
             state.content = null;
             state.error = null;
             state.currentSearch = searchValue;
-            window.location.hash = `#${searchValue}`;
+            // Note: Firefox removes that part, even if we add it ourselves. Oh well?
+            window.location.hash = `#${encodeURIComponent(searchValue)}`;
         },
         addSuggestion(state, suggestion) {
+            suggestion = decodeURIComponent(suggestion);
             if (state.suggestions.indexOf(suggestion) == -1) {
                 console.log("New search value " + suggestion);
                 state.suggestions.push(suggestion);
