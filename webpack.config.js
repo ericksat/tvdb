@@ -58,6 +58,8 @@ module.exports = {
   devtool: '#eval-source-map'
 }
 
+module.exports.mode = "production";
+
 if (process.env.NODE_ENV !== 'production') {
     module.exports.plugins = [
         new webpack.HotModuleReplacementPlugin(),
@@ -65,10 +67,8 @@ if (process.env.NODE_ENV !== 'production') {
     ];
     module.exports.entry.push('webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000'); //?noInfo=true&quiet=true)
     // module.exports.module.rules[0].use.push({ loader: 'webpack-module-hot-accept' });
-}
 
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
+    module.exports.devtool = '#source-map'
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({

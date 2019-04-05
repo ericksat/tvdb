@@ -1,5 +1,5 @@
 <template>
-<div id="posters" class="tab-pane" role="tabpanel">
+<div id="posters" class="tab-pane fade" role="tabpanel">
     <div v-if="selected">
         <div v-if="!chosenPoster" class="posters__list">
             <h4>Top Posters</h4>

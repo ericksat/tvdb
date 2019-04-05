@@ -1,5 +1,5 @@
 <template>
-<div id="episodes" class='tab-pane' role='tabpanel'>
+<div id="episodes" class='tab-pane fade' role='tabpanel'>
     <p>Total Seasons: {{seasons.seasons}}</p>
     <p>Total episodes: {{seasons.episodes}}</p>
     <h4>Seasons</h4>

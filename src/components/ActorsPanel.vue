@@ -1,5 +1,5 @@
 <template>
-<div id="actors" class='tab-pane' role='tabpanel'>
+<div id="actors" class='tab-pane fade' role='tabpanel'>
     <ActorsList v-if="active" :actors="actors" />
 </div>
 </template>

@@ -1,14 +1,22 @@
 <template>
-    <form @submit.prevent="onSubmit" class="form-inline">
-        <div class="form-group">
-            <input class="form-control" type="search" name="searcho" placeholder="Type here to search" v-model="value" list="datolisto" />
-            <button type="submit" class="btn btn-primary">Search</button>
-        </div>
+    <form @submit.prevent="onSubmit" class="search-form">
+        <input class="form-control" type="search" name="searcho" placeholder="Search the TVDB" v-model="value" list="datolisto" />
+        <button type="submit" class="btn btn-primary" aria-label="Search">
+            <i class="fas fa-tv"></i>
+        </button>
         <datalist id="datolisto">
             <option v-for="(item, index) in suggestions" :key="index">{{item}}</option>
         </datalist>
     </form>
 </template>
+
+<style>
+    .search-form {
+        display: flex;
+        max-width: 21rem;
+    }
+</style>
+
 <script>
 // import _ from 'lodash';
 import {mapGetters} from 'vuex';

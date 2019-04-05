@@ -1,5 +1,5 @@
 <template>
-<div id="details" class="tab-pane active" role="tabpanel">
+<div id="details" class="tab-pane fade show active" role="tabpanel">
     <p>{{content.overview}}</p>
     <p>
         First Aired: {{content.firstAired}}<br />
