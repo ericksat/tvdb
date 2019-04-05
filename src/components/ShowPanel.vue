@@ -1,5 +1,11 @@
 <template>
 <div style="margin-top: 2rem">
+    <div v-if="!loading && !content">
+        <h1 class="welcome-text">
+            Welcome to Shmoofel's TVDB Search.<br>
+            Please use the search bar to begin.
+        </h1>
+    </div>
     <div v-if="loading" class="loader__container">
         <div class="loader"></div>
     </div>
@@ -43,6 +49,10 @@
 </template>
 
 <style>
+.welcome-text {
+    font-size: 1.7rem;
+}
+
 .show__container {
     padding-bottom: 2.5rem; /* To adjust for footer */
 }

@@ -1,6 +1,7 @@
 <template>
     <form @submit.prevent="onSubmit" class="search-form">
-        <input class="form-control" type="search" name="searcho" placeholder="Search the TVDB" v-model="value" list="datolisto" />
+        <input class="form-control" type="search" name="searcho" placeholder="Search the TVDB"
+        @focus="elementFocus" @blur="elementBlur" v-model="value" list="datolisto" />
         <button type="submit" class="btn btn-primary" aria-label="Search">
             <i class="fas fa-tv"></i>
         </button>
@@ -39,6 +40,12 @@ export default {
         })
     },
     methods: {
+        elementFocus() {
+            document.querySelector(".topbar").classList.add("focus");
+        },
+        elementBlur() {
+            document.querySelector(".topbar").classList.remove("focus");
+        },
         onSubmit() {
             let searchValue = this.value.trim();
             if (searchValue.length === 0) return;

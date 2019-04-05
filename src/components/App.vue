@@ -7,7 +7,7 @@
       </div>
     </section>
 
-    <div class="container">
+    <div class="container container-main">
       <div v-if="error" class="alert alert-danger mt-2">Error: {{error}}</div>
       <ShowPanel v-if="!error"/>
       <Footer/>
@@ -65,5 +65,15 @@ export default {
     background: #222;
     border-bottom: 1px solid #fff;
     background-image: linear-gradient(to bottom, #484747 0%, #828181 125%);
+    opacity: 0.95;
+    transition: opacity 0.5s;
+}
+
+.topbar.focus {
+    opacity: 1;
+}
+
+.container-main {
+    padding-bottom: 1.75rem;
 }
 </style>

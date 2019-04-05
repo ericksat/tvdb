@@ -1,5 +1,6 @@
 body {
     overflow-y: scroll;
+    background-image: linear-gradient(to right, #666 0%, #222 5%, #222 95%, #666 100%);
 }
 
 .btn-season {
