@@ -1,7 +1,9 @@
 <template>
 <div id="episodes" class='tab-pane fade' role='tabpanel'>
-    <p>Total Seasons: {{seasons.seasons}}</p>
-    <p>Total episodes: {{seasons.episodes}}</p>
+    <h4 class="mt-2 mb-3">
+        <i class="fas fa-tv"></i>
+        {{seasons.episodes}} Episodes
+    </h4>
     <h4>Seasons</h4>
     <div class="btn-group" role="group" aria-label="Seasons Button Group">
         <button v-for="season in seasonList" @click="bringMeSeason(season)" :key="season"

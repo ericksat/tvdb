@@ -2,7 +2,7 @@
 <div id="posters" class="tab-pane fade" role="tabpanel">
     <div v-if="selected">
         <div v-if="!chosenPoster" class="posters__list">
-            <h4>Top Posters</h4>
+            <!-- <h4>Top Posters</h4> -->
             <span v-for="(poster, index) in topPosters" :key="index">
                 <img :src="poster" @click="choosePoster(poster)" />
             </span>
@@ -22,7 +22,7 @@ export default {
     data() {
         return {
             chosenPoster: null,
-            loadedPosters: 12,
+            loadedPosters: 16,
             busy: false,
         }
     },
