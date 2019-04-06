@@ -1,9 +1,13 @@
 <template>
 <div id="details" class="tab-pane fade show active" role="tabpanel">
-    <p>{{content.overview}}</p>
+    <p class="overview">{{content.overview}}</p>
     <p>
-        First Aired: {{content.firstAired}}<br />
-        Rating: {{content.siteRating}}<br />
+        <span v-if="content.firstAired">
+            First Aired: {{moment(content.firstAired).format('MMMM Do, YYYY')}}<br />
+        </span>
+        <span v-if="content.siteRating">
+            Rating: {{content.siteRating}}<br />
+        </span>
         Network: {{content.network}}<br>
         Status: {{content.status}}<br>
         Seasons: {{content.seasons.seasons}}
@@ -22,6 +26,11 @@
 <style>
     ul.genre-list>li>a {
         color: #a5d1ff !important;
+    }
+
+    .overview {
+        padding: 1rem 0 1rem 0.5rem;
+        border-left: 1px solid white;
     }
 </style>
 

@@ -53,7 +53,6 @@ export default {
       },
     },
     mounted() {
-        console.log("Seasons panel mounted");
         this.selectedSeason = 1;
         this.bringMeSeason(1);
     }
