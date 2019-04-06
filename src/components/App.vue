@@ -8,7 +8,7 @@
     </section>
 
     <div class="container container-main">
-      <div v-if="error" class="alert alert-danger mt-2">Error: {{error}}</div>
+      <div v-if="error" class="alert alert-danger mt-4">Error: {{error}}</div>
       <ShowPanel v-if="!error"/>
       <Footer/>
     </div>

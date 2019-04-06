@@ -11,18 +11,23 @@
 <style>
 .myfooter {
     position: fixed;
-    left: 0;
-    bottom: 0;
+    left: 0; bottom: 0;
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.5rem 0;
     font-style: italic;
     font-size: 0.9rem;
     text-align: center;
     color: #aaa;
-    background-color: #333333;
-    /* background-image: linear-gradient(to right, #666 0%, #222 5%, #222 95%, #666 100%); */
+    /* background-color: #333333; */
+    background-image: linear-gradient(to right, #666 0%, #222 5%, #222 95%, #666 100%);
     border-top: 1px solid #fff;
     opacity: 0.95;
+}
+
+@media screen and (max-height: 359px) {
+    .myfooter {
+        display: none;
+    }
 }
 
 .myfooter a {
