@@ -3,9 +3,11 @@
     <p>Total Seasons: {{seasons.seasons}}</p>
     <p>Total episodes: {{seasons.episodes}}</p>
     <h4>Seasons</h4>
-    <button v-for="season in seasonList" @click="bringMeSeason(season)" :key="season"
-    v-bind:class="{btn: true, 'btn-season': true, 'btn-info': season === selectedSeason, 'btn-default': season !== selectedSeason }"
-    >{{season}}</button>
+    <div class="btn-group" role="group" aria-label="Seasons Button Group">
+        <button v-for="season in seasonList" @click="bringMeSeason(season)" :key="season"
+        :class="{btn: true, 'btn-season': true, 'btn-info': season === selectedSeason, 'btn-default': season !== selectedSeason }"
+        >{{season}}</button>
+    </div>
     <div v-if="selectedSeason" class="mt-3">
         <div v-for="episode in episodes" :key="episode.absoluteNumber">
             <h5>{{ episode.episodeName }} ({{episode.firstAired}})</h5>
@@ -51,7 +53,9 @@ export default {
       },
     },
     mounted() {
-        // console.log("Seasons panel mounted");
+        console.log("Seasons panel mounted");
+        this.selectedSeason = 1;
+        this.bringMeSeason(1);
     }
 }
 </script>

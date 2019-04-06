@@ -67,6 +67,7 @@ export default {
     background-image: linear-gradient(to bottom, #484747 0%, #828181 125%);
     opacity: 0.95;
     transition: opacity 0.5s;
+    z-index: 5000;
 }
 
 .topbar.focus {

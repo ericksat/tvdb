@@ -4,7 +4,9 @@
     <p>
         First Aired: {{content.firstAired}}<br />
         Rating: {{content.siteRating}}<br />
-        Network: {{content.network}}, Status: {{content.status}}
+        Network: {{content.network}}<br>
+        Status: {{content.status}}<br>
+        Seasons: {{content.seasons.seasons}}
     </p>
     <h3>Genres</h3>
     <ul class="genre-list">
