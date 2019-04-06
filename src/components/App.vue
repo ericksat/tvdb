@@ -64,7 +64,7 @@ export default {
     padding-bottom: 1rem;
     background: #222;
     border-bottom: 1px solid #fff;
-    background-image: linear-gradient(to bottom, #484747 0%, #828181 125%);
+    background-image: linear-gradient(180deg,#484747 0,#656565 100%);
     opacity: 0.95;
     transition: opacity 0.5s;
     z-index: 5000;

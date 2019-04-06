@@ -4,8 +4,10 @@
       <a href="https://nodejs.org/" target="_blank"><i class="fab fa-node-js"></i> Node.js</a> |
       <a href="https://vuejs.org/" target="_blank"><i class="fab fa-vuejs"></i> Vue.js</a> |
       <a href="https://jquery.com/" target="_blank">Jquery</a> |
-      <a href="https://fontawesome.com/" target="_blank"><i class="fab fa-font-awesome"></i> Font Awesome</a> |
       <a href="https://getbootstrap.com/" target="_blank"><i class="fab fa-bootstrap"></i> Bootstrap</a>
+      <span class="d-none d-md-inline">
+        | <a href="https://fontawesome.com/" target="_blank"><i class="fab fa-font-awesome"></i> Font Awesome</a>
+      </span>
   </footer>
 </template>
 <style>
