@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const APIKEY = 'F23C95D5D38FE20E';
 const REMOTE = 'https://api.thetvdb.com/';
-const REMOTE_PUBLIC = 'https://www.thetvdb.com/';
+const REMOTE_ARTWORK = 'https://artworks.thetvdb.com/';
 const CACHE_DEFAULT = 3600 * 24; // In seconds
 
 let token;
@@ -111,7 +111,7 @@ class Fetcher {
         return actors.map(actor => {
             return {
                 id: actor.id,
-                image: actor.image ? `https://www.thetvdb.com/banners/${actor.image}` : "/img/logo.png",
+                image: actor.image ? `${REMOTE_ARTWORK}banners/${actor.image}` : "/img/logo.png",
                 name: actor.name,
                 role: actor.role,
                 sortOrder: actor.sortOrder
@@ -125,18 +125,19 @@ class Fetcher {
         const url = `${REMOTE}series/${showId}/episodes/summary`;
         let response = await axios.get(url, this.getOpts());
         let data = response.data.data;
-        if (data.airedSeasons) {
+        if (data.airedSeasons && data.airedSeasons.length > 0) {
             return {
                 episodes: data.airedEpisodes,
                 seasons: data.airedSeasons.reduce((a, b) => Math.max(a, b))
             }
         }
-        if (data.dvdSeasons) {
+        if (data.dvdSeasons && data.dvdSeasons.length > 0) {
             return {
                 episodes: data.dvdEpisodes,
                 seasons: data.dvdSeasons.reduce((a, b) => Math.max(a, b))
             }
         }
+
         return {
             episodes: 0,
             seasons: 0
@@ -148,13 +149,13 @@ class Fetcher {
         // console.log("Getting actors", url);
         let response = await axios.get(url, this.getOpts());
         let posters = response.data.data;
-        posters = posters.map((poster) => `${REMOTE_PUBLIC}banners/${poster.thumbnail}`);
+        posters = posters.map((poster) => `${REMOTE_ARTWORK}banners/${poster.thumbnail}`);
         return posters;
     }
 
     async show(name) {
         // Try cache first
-        let data = this.getCached(name);
+        let data = null; // this.getCached(name);
         if (data) {
             // console.log(`Returning cached ${name}`);
             db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
@@ -176,17 +177,18 @@ class Fetcher {
             // Get fuller data
             // console.log("Extra url = ", urlExtra + showId);
             let extra = await axios.get(urlExtra + showId, opts);
+
             data = Object.assign(data, extra.data.data);
             data.actors = await this.getActors(showId);
             data.seasons = await this.getSeasons(showId);
             data.posters = await this.getPosters(showId);
-            data.banner = `https://www.thetvdb.com/banners/${data.banner}`;
+            data.banner = `${REMOTE_ARTWORK}banners/${data.banner}`;
             // console.log("final data", data);
-            // console.log("Cached " + url);
             this.putInCache(name, data);
+            // console.log("Cached, adding suggestion");
             db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
         } catch (e) {
-            console.log(`Failed to fetch ${url}`, e.message);
+            console.log(`Failed to fetch ${url}`, e.message, e.stack);
             if (e.message.indexOf('code 404') !== -1) {
                 let errText = `Could not find any TV show matching ${name}`;
                 this.putInCache(name, {error: errText}); // Keeping this result in cache would save on useless future searches

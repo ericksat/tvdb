@@ -3,7 +3,7 @@
     <div class="actor-item" v-for="actor in actors" :key="actor.id">
         <div class="actor-item__name"><a :href="linko(actor.name)" target="_blank">{{actor.name}}</a></div>
         <div class="actor-item__role">{{actor.role}}</div>
-        <img v-if="actor.image.length > 0" class="actor-item__image" :src="actor.image" />
+        <img class="actor-item__image" :src="actor.image" />
     </div>
 </div>
 </template>
