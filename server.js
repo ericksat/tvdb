@@ -26,6 +26,11 @@ if (process.env.NODE_ENV !== 'production') {
         log: false,
     });
     app.use(hotMiddleware);
+
+    app.use((req, res, next) => {
+        res.setHeader('access-control-allow-origin', '*');
+        next();
+    });
 }
 
 // Static routes
