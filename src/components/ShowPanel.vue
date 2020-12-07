@@ -1,5 +1,5 @@
 <template>
-<div style="margin-top: 2rem">
+<div class='showPanel'>
     <div v-if="!loading && !content">
         <h1 class="welcome-text">
             Welcome to Shmoofel's TVDB Search.<br>
@@ -49,6 +49,16 @@
 </template>
 
 <style>
+.showPanel {
+    margin-top: 2rem;
+}
+
+@media screen and (max-width: 575px) {
+    .showPanel {
+        margin-top: 1.1rem;
+    }
+}
+
 .welcome-text {
     font-size: 1.7rem;
 }

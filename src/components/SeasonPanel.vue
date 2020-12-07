@@ -60,3 +60,9 @@ export default {
     }
 }
 </script>
+<style scoped>
+    .btn-group {
+        max-width: 98%;
+        overflow: auto;
+    }
+</style>
