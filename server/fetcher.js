@@ -166,9 +166,9 @@ class Fetcher {
 
     async show(name) {
         // Try cache first
-        let data = null; // this.getCached(name);
+        let data = this.getCached(name);
         if (data) {
-            // console.log(`Returning cached ${name}`);
+            console.log(`Returning cached ${name}`);
             db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
             return data.content;
         }
@@ -271,9 +271,12 @@ class Fetcher {
 
         // console.log("Getting actors", url);
         let response = await axios.get(url, this.getOpts());
-        let final = response.data.data;
-        db.put(key, final, CACHE_DEFAULT, 'episodes');
-        return final;
+        let episodes = response.data.data;
+        episodes = episodes.map((item) => pick(item, ["id", "absoluteNumber", "contentRating", "episodeName", "firstAired", "overview"]))
+        episodes.sort((a, b) => a.absoluteNumber - b.absoluteNumber);
+
+        db.put(key, episodes, CACHE_DEFAULT, 'episodes');
+        return episodes;
     }
 
     /**

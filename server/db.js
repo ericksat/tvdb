@@ -28,7 +28,9 @@ class DbManager {
     put(key, content, expireSeconds, collection= "shows") {
         // console.log(`Storing ${key}`);
         let expires = Date.now() + (expireSeconds * 1000);
-        this.db.get(collection).push({ id: key.trim().toLowerCase(), content, expires }).write();
+        key = key.trim().toLowerCase();
+        this.db.get(collection).remove({ id: key }).write();
+        this.db.get(collection).push({ id: key, content, expires }).write();
     }
 
     showGc() {
