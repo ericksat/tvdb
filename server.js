@@ -15,17 +15,17 @@ const port = process.env.PORT || 3000;
 
 // Hotloader for test environment
 if (process.env.NODE_ENV !== 'production') {
-    const webpack = require('webpack');
-    const middleware = require('webpack-dev-middleware');
-    const webpackConfig = require('./webpack.config.js');
-    const compiler = webpack(webpackConfig);
-    app.use(middleware(compiler, {
-        publicPath: webpackConfig.output.publicPath,
-    }));
-    const hotMiddleware = require('webpack-hot-middleware')(compiler, {
-        log: false,
-    });
-    app.use(hotMiddleware);
+    // const webpack = require('webpack');
+    // const middleware = require('webpack-dev-middleware');
+    // const webpackConfig = require('./webpack.config.js');
+    // const compiler = webpack(webpackConfig);
+    // app.use(middleware(compiler, {
+    //     publicPath: webpackConfig.output.publicPath,
+    // }));
+    // const hotMiddleware = require('webpack-hot-middleware')(compiler, {
+    //     log: false,
+    // });
+    // app.use(hotMiddleware);
 
     app.use((req, res, next) => {
         res.setHeader('access-control-allow-origin', '*');

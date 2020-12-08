@@ -9,6 +9,17 @@ const CACHE_DEFAULT = 3600 * 24; // In seconds
 
 let token;
 
+function pick(src, props) {
+    // Make sure object and properties are provided
+    if (!src || !props) return;
+    // Create new object
+    const picked = {};
+    // Loop through props and push to new object
+    props.forEach(prop => picked[prop] = src[prop]);
+    // Return new object
+    return picked;
+}
+
 class Fetcher {
     constructor() {
         axios.defaults.headers = {
@@ -179,10 +190,19 @@ class Fetcher {
             let extra = await axios.get(urlExtra + showId, opts);
 
             data = Object.assign(data, extra.data.data);
+            // Pick only certain properties
+            data = pick(data, [
+                'id', 'banner', 'firstAired', 'aliases', 'image', 'network', 'overview',
+                'seriesName', 'status', 'genre', 'rating', 'siteRating'
+            ]);
+
+            // Add ours
             data.actors = await this.getActors(showId);
             data.seasons = await this.getSeasons(showId);
             data.posters = await this.getPosters(showId);
             data.banner = `${REMOTE_ARTWORK}banners/${data.banner}`;
+
+
             // console.log("final data", data);
             this.putInCache(name, data);
             // console.log("Cached, adding suggestion");
