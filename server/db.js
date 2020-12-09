@@ -29,6 +29,7 @@ class DbManager {
         // console.log(`Storing ${key}`);
         let expires = Date.now() + (expireSeconds * 1000);
         key = key.trim().toLowerCase();
+        // TODO: Do one write, not two (with testing)
         this.db.get(collection).remove({ id: key }).write();
         this.db.get(collection).push({ id: key, content, expires }).write();
     }

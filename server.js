@@ -46,9 +46,18 @@ app.get("/", function (req, res) {
     res.sendFile(path.join(__dirname, './index.html'));
 });
 
-app.get('/show/:name', async (req, res) => {
+app.get('/show/:id', async (req, res) => {
     try {
-        let fetchRes = await fetcher.show(req.params.name);
+        let fetchRes = await fetcher.show(req.params.id);
+        res.send(fetchRes);
+    } catch (e) {
+        res.send({ success: false, error: e.message });
+    }
+});
+
+app.get('/search/:query', async (req, res) => {
+    try {
+        let fetchRes = await fetcher.search(req.params.query);
         res.send(fetchRes);
     } catch (e) {
         res.send({ success: false, error: e.message });

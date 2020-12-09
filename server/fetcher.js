@@ -89,7 +89,6 @@ class Fetcher {
     putInCache(name, data) {
         // console.log("Putting in cache");
         if (data.error) {
-            console.log("Error during putInCache")
             db.put(name.trim().toLowerCase(), data, CACHE_DEFAULT);
         }
         try {
@@ -164,34 +163,63 @@ class Fetcher {
         return posters;
     }
 
-    async show(name) {
+    async search(query) {
         // Try cache first
-        let data = this.getCached(name);
+        // let data = this.getCached(query);
+        // if (data) {
+        //     console.log(`Returning cached ${query}`);
+        //     db.addSuggestion(query.trim()); // A successful result will be used in future suggestions
+        //     return data.content;
+        // }
+        // console.log(`Did not find ${name} in db.`);
+
+        // Go to remote
+        const url = `${REMOTE}search/series?name=${encodeURIComponent(query)}`;
+        try {
+            const opts = this.getOpts();
+            // console.log("Contacting remote " + url);
+            let response = await axios.get(url, opts);
+            // console.log("Managed to get response");
+            //  console.log(response.data.data);
+            // We only want the first response right now, for brevity
+            const data = response.data.data.map((item) => pick(item, ['id', 'seriesName', 'image', 'status']));
+
+            // console.log("final data", data);
+            this.putInCache(query, data);
+            // console.log("Cached, adding suggestion");
+            db.addSuggestion(query.trim()); // A successful result will be used in future suggestions
+            return data;
+        } catch (e) {
+            console.log(`Failed to fetch ${url}`, e.message, e.stack);
+            if (e.message.indexOf('code 404') !== -1) {
+                let errText = `Could not find any TV show matching ${query}`;
+                this.putInCache(query, {error: errText}); // Keeping this result in cache would save on useless future searches
+                throw new Error(errText);
+            }
+            throw e;
+        }
+    }
+
+    async show(showId) {
+        // Try cache first
+        const cacheKey = `show_${showId}`;
+        let data = null; // this.getCached(cacheKey);
         if (data) {
-            console.log(`Returning cached ${name}`);
-            db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
+            console.log(`Returning cached ${cacheKey}`);
             return data.content;
         }
         // console.log(`Did not find ${name} in db.`);
 
         // Go to remote
-        const url = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
+        const url = `${REMOTE}/series/${showId}`;
         try {
-            const urlExtra = `${REMOTE}series/`;
             const opts = this.getOpts();
             // console.log("Contacting remote " + url);
             let response = await axios.get(url, opts);
             // console.log(response);
-            // We only want the first response right now, for brevity
-            data = response.data.data.length ? response.data.data[0] : null;
-            let showId = data.id
-            // Get fuller data
-            // console.log("Extra url = ", urlExtra + showId);
-            let extra = await axios.get(urlExtra + showId, opts);
 
-            data = Object.assign(data, extra.data.data);
             // Pick only certain properties
-            data = pick(data, [
+            data = pick(response.data.data, [
                 'id', 'banner', 'firstAired', 'aliases', 'image', 'network', 'overview',
                 'seriesName', 'status', 'genre', 'rating', 'siteRating'
             ]);
@@ -202,22 +230,17 @@ class Fetcher {
             data.posters = await this.getPosters(showId);
             data.banner = `${REMOTE_ARTWORK}banners/${data.banner}`;
 
-
             // console.log("final data", data);
-            this.putInCache(name, data);
-            // console.log("Cached, adding suggestion");
-            db.addSuggestion(name.trim()); // A successful result will be used in future suggestions
+            this.putInCache(cacheKey, data);
+            return data;
         } catch (e) {
             console.log(`Failed to fetch ${url}`, e.message, e.stack);
             if (e.message.indexOf('code 404') !== -1) {
-                let errText = `Could not find any TV show matching ${name}`;
-                this.putInCache(name, {error: errText}); // Keeping this result in cache would save on useless future searches
+                let errText = `Could not find any TV show matching ${query}`;
                 throw new Error(errText);
             }
             throw e;
         }
-
-        return data;
     }
 
     listFromFile(filename) {
