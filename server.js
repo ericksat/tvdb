@@ -47,15 +47,22 @@ app.get("/", function (req, res) {
 });
 
 app.get('/show/:id', async (req, res) => {
+    console.log("Getting you a show " + req.params.id);
     try {
         let fetchRes = await fetcher.show(req.params.id);
         res.send(fetchRes);
     } catch (e) {
-        res.send({ success: false, error: e.message });
+        // I don't feel like messing with imports now
+        if (e.message.indexOf("paid-for API") !== -1) {
+            res.status(200).send({ success: false, error: e.message });
+        } else {
+            res.send({ success: false, error: e.message });
+        }
     }
 });
 
 app.get('/search/:query', async (req, res) => {
+    console.log("Doing you a search");
     try {
         let fetchRes = await fetcher.search(req.params.query);
         res.send(fetchRes);

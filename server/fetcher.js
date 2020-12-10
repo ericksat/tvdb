@@ -9,6 +9,10 @@ const CACHE_DEFAULT = 3600 * 24; // In seconds
 
 let token;
 
+class BadApiError extends Error {
+
+}
+
 function pick(src, props) {
     // Make sure object and properties are provided
     if (!src || !props) return;
@@ -182,7 +186,11 @@ class Fetcher {
             // console.log("Managed to get response");
             //  console.log(response.data.data);
             // We only want the first response right now, for brevity
-            const data = response.data.data.map((item) => pick(item, ['id', 'seriesName', 'image', 'status']));
+            const data = response.data.data.map((item) => {
+                item = pick(item, ['id', 'seriesName', 'image', 'status', 'firstAired']);
+                item.image = `${REMOTE_ARTWORK}${item.image}`.replace(/\/\//g, "/");
+                return item;
+            });
 
             // console.log("final data", data);
             this.putInCache(query, data);
@@ -211,12 +219,12 @@ class Fetcher {
         // console.log(`Did not find ${name} in db.`);
 
         // Go to remote
-        const url = `${REMOTE}/series/${showId}`;
+        const url = `${REMOTE}series/${showId}`;
         try {
             const opts = this.getOpts();
             // console.log("Contacting remote " + url);
             let response = await axios.get(url, opts);
-            // console.log(response);
+            // console.log(response.data);
 
             // Pick only certain properties
             data = pick(response.data.data, [
@@ -224,16 +232,29 @@ class Fetcher {
                 'seriesName', 'status', 'genre', 'rating', 'siteRating'
             ]);
 
+            if (!data.seriesName) throw BadApiError();
+
             // Add ours
-            data.actors = await this.getActors(showId);
-            data.seasons = await this.getSeasons(showId);
-            data.posters = await this.getPosters(showId);
+            try {
+                data.actors = await this.getActors(showId);
+                data.seasons = await this.getSeasons(showId);
+                data.posters = await this.getPosters(showId);
+            } catch (e) {
+                console.log(`Failed to get additional data for ${showId}`);
+                throw new BadApiError();
+            }
+
             data.banner = `${REMOTE_ARTWORK}banners/${data.banner}`;
 
             // console.log("final data", data);
             this.putInCache(cacheKey, data);
             return data;
         } catch (e) {
+            if (e instanceof BadApiError) {
+                console.log(`${url} doesn't fit the old API`);
+                throw Error("This show uses the new, paid-for API");
+            }
+
             console.log(`Failed to fetch ${url}`, e.message, e.stack);
             if (e.message.indexOf('code 404') !== -1) {
                 let errText = `Could not find any TV show matching ${query}`;
