@@ -125,7 +125,7 @@ class Fetcher {
         return actors.map(actor => {
             return {
                 id: actor.id,
-                image: actor.image ? `${REMOTE_ARTWORK}banners/${actor.image}` : "/img/logo.png",
+                image: actor.image ? `${REMOTE_ARTWORK}banners/${actor.image}` : null,
                 name: actor.name,
                 role: actor.role,
                 sortOrder: actor.sortOrder
