@@ -232,7 +232,7 @@ class Fetcher {
                 'seriesName', 'status', 'genre', 'rating', 'siteRating'
             ]);
 
-            if (!data.seriesName) throw BadApiError();
+            if (!data.seriesName) throw new BadApiError();
 
             // Add ours
             try {
@@ -244,7 +244,7 @@ class Fetcher {
                 throw new BadApiError();
             }
 
-            data.banner = `${REMOTE_ARTWORK}banners/${data.banner}`;
+            data.banner = data.banner ? `${REMOTE_ARTWORK}banners/${data.banner}` : null;
 
             // console.log("final data", data);
             this.putInCache(cacheKey, data);
