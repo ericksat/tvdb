@@ -34,10 +34,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Static routes
-app.use(express.static(path.join(__dirname, './src/assets')));
-if (process.env.NODE_ENV === 'production') {
+// app.use(express.static(path.join(__dirname, './src/assets')));
+// if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, './dist')));
-}
+// }
 
 // Verify login status
 app.use(fetcher.verifyValidToken.bind(fetcher));
