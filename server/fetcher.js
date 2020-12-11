@@ -167,7 +167,7 @@ class Fetcher {
     async search(query) {
         // Try cache first
         const cacheKey = `search:${query.trim().toLowerCase()}`;
-        let data = this.getCached(cacheKey);
+        let data = null; // this.getCached(cacheKey);
         if (data) {
             console.log(`Returning cached ${cacheKey}`);
             return data.content;
@@ -185,7 +185,7 @@ class Fetcher {
             // We only want the first response right now, for brevity
             const data = response.data.data.map((item) => {
                 item = pick(item, ['id', 'seriesName', 'image', 'status', 'firstAired']);
-                item.image = `${REMOTE_ARTWORK}${item.image}`.replace(/\/\//g, "/");
+                item.image = `${REMOTE_ARTWORK}${item.image}`.replace("//banners", "/banners");
                 return item;
             });
 
