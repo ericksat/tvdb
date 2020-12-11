@@ -8,11 +8,11 @@ class DbManager {
     constructor() {
         this.db = lowdb(adapter);
         // Set some defaults
-        this.db.defaults({ shows: [], episodes: [], suggestions: [], showsIndex: [], token: null }).write();
+        this.db.defaults({ shows: [], episodes: [], suggestions: [], search: [], token: null }).write();
     }
 
     get(key, collection = "shows") {
-        key = key.toLowerCase();
+        key = key.trim().toLowerCase();
         // console.log(`Requesting ${key}`);
         let thingy = this.db.get(collection).find({ id: key }).value();
         if (!thingy) return null;
@@ -25,19 +25,23 @@ class DbManager {
         return thingy;
     }
 
-    put(key, content, expireSeconds, collection= "shows") {
-        // console.log(`Storing ${key}`);
+    put(key, content, expireSeconds, collectionName = "shows") {
+        console.log(`Storing ${key} in ${collectionName}`);
         let expires = Date.now() + (expireSeconds * 1000);
         key = key.trim().toLowerCase();
-        // TODO: Do one write, not two (with testing)
-        this.db.get(collection).remove({ id: key }).write();
-        this.db.get(collection).push({ id: key, content, expires }).write();
+
+        // console.log(content);
+
+        let collection = this.db.get(collectionName);
+        // .remove({ id: key })
+        collection.push({ id: key, content, expires }).write();
     }
 
-    showGc() {
+    runGarbageCollector() {
         let now = Date.now();
         this.db.get('shows').remove((item) => item.expires < now).write();
-        console.log("Ran show garbage collector.");
+        this.db.get('search').remove((item) => item.expires < now).write();
+        console.log("Ran garbage collector.");
     }
 
     getToken() {

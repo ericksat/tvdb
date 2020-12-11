@@ -4,14 +4,13 @@ const fs = require('fs');
 
 const APIKEY = 'F23C95D5D38FE20E';
 const REMOTE = 'https://api.thetvdb.com/';
-const REMOTE_ARTWORK = 'https://artworks.thetvdb.com/';
-const CACHE_DEFAULT = 3600 * 24; // In seconds
+const REMOTE_ARTWORK    = 'https://artworks.thetvdb.com/';
+const SHOW_CACHE_TIME   = 12 * 60 * 60; // In seconds, not milliseconds
+const SEARCH_CACHE_TIME = 1 * 60 * 60; // In seconds, not milliseconds
 
 let token;
 
-class BadApiError extends Error {
-
-}
+class BadApiError extends Error {}
 
 function pick(src, props) {
     // Make sure object and properties are provided
@@ -31,7 +30,7 @@ class Fetcher {
             'Accept': 'application/json',
         };
         // console.log("Called fetcher constructor");
-        this.timer = setInterval(this.garbageCollector.bind(this), 900000);
+        this.timer = setInterval(this.garbageCollector.bind(this), 15 * 60 * 1000);
     }
 
     async signin() {
@@ -68,17 +67,18 @@ class Fetcher {
         db.putToken(token.content);
     }
 
-    getCached(name) {
+    getCached(key) {
         try {
             // const key = `${REMOTE}search/series?name=${encodeURIComponent(name)}`;
-            let key = name.trim().toLowerCase();
-            // Check in index
-            let indexedKey = db.getIndex(key);
-            if (indexedKey) {
-                // console.log("Returning indexed key " + indexedKey);
-                return db.get(indexedKey);
-            }
-            return db.get(key);
+            const [collection, document] = key.split(":", 2);
+            // let key = name.trim().toLowerCase();
+            // Check in index - it's a small DB so why make things complex and buggy?
+            // let indexedKey = db.getIndex(key);
+            // if (indexedKey) {
+            //     // console.log("Returning indexed key " + indexedKey);
+            //     return db.get(indexedKey);
+            // }
+            return db.get(document, collection);
         } catch (e) {
             console.log(e);
             throw e;
@@ -90,27 +90,24 @@ class Fetcher {
      *
      * @param {Array} data
      */
-    putInCache(name, data) {
-        // console.log("Putting in cache");
-        if (data.error) {
-            db.put(name.trim().toLowerCase(), data, CACHE_DEFAULT);
-        }
+    putInCache(key, data, cacheTime) {
         try {
-            let key = data.seriesName ? data.seriesName.trim().toLowerCase() : name.trim().toLowerCase();
-            // console.log("Putting some key " + key);
-            db.put(key, data, CACHE_DEFAULT);
+            console.log("Putting in cache");
+            const [collection, document] = key.split(":", 2);
+
+            db.put(document, data, cacheTime, collection);
             // console.log("Now indexes");
-            // Update index
-            let indexEntries = [name];
-            if (data.aliases && data.aliases.length > 0) {
-                for (let alias of data.aliases) {
-                    indexEntries.push(alias);
-                }
-            }
-            // Insert or replace all values in index
-            for (let entry of indexEntries) {
-                db.updateIndex(entry, key);
-            }
+            // Update index - we're not dealing with a giant database, so why make things more complex?
+            // let indexEntries = [key];
+            // if (data.aliases && data.aliases.length > 0) {
+            //     for (let alias of data.aliases) {
+            //         indexEntries.push(alias);
+            //     }
+            // }
+            // // Insert or replace all values in index
+            // for (let entry of indexEntries) {
+            //     db.updateIndex(entry, key);
+            // }
         } catch (e) {
             console.log(e);
             throw e;
@@ -169,13 +166,13 @@ class Fetcher {
 
     async search(query) {
         // Try cache first
-        // let data = this.getCached(query);
-        // if (data) {
-        //     console.log(`Returning cached ${query}`);
-        //     db.addSuggestion(query.trim()); // A successful result will be used in future suggestions
-        //     return data.content;
-        // }
-        // console.log(`Did not find ${name} in db.`);
+        const cacheKey = `search:${query.trim().toLowerCase()}`;
+        let data = this.getCached(cacheKey);
+        if (data) {
+            console.log(`Returning cached ${cacheKey}`);
+            return data.content;
+        }
+        console.log(`Did not find ${cacheKey} in db.`);
 
         // Go to remote
         const url = `${REMOTE}search/series?name=${encodeURIComponent(query)}`;
@@ -193,7 +190,7 @@ class Fetcher {
             });
 
             // console.log("final data", data);
-            this.putInCache(query, data);
+            this.putInCache(cacheKey, data, SEARCH_CACHE_TIME);
             // console.log("Cached, adding suggestion");
             db.addSuggestion(query.trim()); // A successful result will be used in future suggestions
             return data;
@@ -201,7 +198,7 @@ class Fetcher {
             console.log(`Failed to fetch ${url}`, e.message, e.stack);
             if (e.message.indexOf('code 404') !== -1) {
                 let errText = `Could not find any TV show matching ${query}`;
-                this.putInCache(query, {error: errText}); // Keeping this result in cache would save on useless future searches
+                this.putInCache(cacheKey, {error: errText}, SEARCH_CACHE_TIME); // Keeping this result in cache would save on useless future searches
                 throw new Error(errText);
             }
             throw e;
@@ -210,13 +207,13 @@ class Fetcher {
 
     async show(showId) {
         // Try cache first
-        const cacheKey = `show_${showId}`;
-        let data = null; // this.getCached(cacheKey);
+        const cacheKey = `shows:${showId}`;
+        let data = this.getCached(cacheKey);
         if (data) {
             console.log(`Returning cached ${cacheKey}`);
             return data.content;
         }
-        // console.log(`Did not find ${name} in db.`);
+        console.log(`Did not find ${cacheKey} in db.`);
 
         // Go to remote
         const url = `${REMOTE}series/${showId}`;
@@ -247,7 +244,7 @@ class Fetcher {
             data.banner = data.banner ? `${REMOTE_ARTWORK}banners/${data.banner}` : null;
 
             // console.log("final data", data);
-            this.putInCache(cacheKey, data);
+            this.putInCache(cacheKey, data, SHOW_CACHE_TIME);
             return data;
         } catch (e) {
             if (e instanceof BadApiError) {
@@ -317,9 +314,13 @@ class Fetcher {
         let response = await axios.get(url, this.getOpts());
         let episodes = response.data.data;
         episodes = episodes.map((item) => pick(item, ["id", "absoluteNumber", "contentRating", "episodeName", "firstAired", "overview"]))
-        episodes.sort((a, b) => a.absoluteNumber - b.absoluteNumber);
+        // Stupid API means we have to try different fields
+        episodes.sort((a, b) => {
+            if (a.absoluteNumber && b.absoluteNumber) return a.absoluteNumber - b.absoluteNumber;
+            return a.firstAired - b.firstAired;
+        });
 
-        db.put(key, episodes, CACHE_DEFAULT, 'episodes');
+        db.put(key, episodes, SEARCH_CACHE_TIME, 'episodes');
         return episodes;
     }
 
@@ -327,7 +328,8 @@ class Fetcher {
      * Run this periodically to remove old entries from the fucking db
      */
     garbageCollector() {
-        db.showGc();
+        console.log("Running garbage collector");
+        db.runGarbageCollector();
     }
 
     fetchSuggestions(filter) {

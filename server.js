@@ -47,7 +47,6 @@ app.get("/", function (req, res) {
 });
 
 app.get('/show/:id', async (req, res) => {
-    console.log("Getting you a show " + req.params.id);
     try {
         let fetchRes = await fetcher.show(req.params.id);
         res.send(fetchRes);
@@ -62,7 +61,6 @@ app.get('/show/:id', async (req, res) => {
 });
 
 app.get('/search/:query', async (req, res) => {
-    console.log("Doing you a search");
     try {
         let fetchRes = await fetcher.search(req.params.query);
         res.send(fetchRes);
