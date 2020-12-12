@@ -1,9 +1,8 @@
 const lowdb = require('lowdb');
 
 const FileAdapter = require('lowdb/adapters/FileSync')
-// const Memory = require('lowdb/adapters/Memory')
-// const adapter = process.env.NODE_ENV === 'production' ? new Memory() : new FileSync('db.json');
-const adapter = new FileAdapter('db.json');
+const Memory = require('lowdb/adapters/Memory')
+const adapter = process.env.NODE_ENV === 'production' ? new Memory() : new FileAdapter('db.json');
 
 class DbManager {
     constructor() {
