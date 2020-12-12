@@ -92,7 +92,7 @@ class Fetcher {
      */
     putInCache(key, data, cacheTime) {
         try {
-            console.log("Putting in cache");
+            console.log(`Putting ${key} in cache`);
             const [collection, document] = key.split(":", 2);
 
             db.put(document, data, cacheTime, collection);
@@ -167,7 +167,7 @@ class Fetcher {
     async search(query) {
         // Try cache first
         const cacheKey = `search:${query.trim().toLowerCase()}`;
-        let data = null; // this.getCached(cacheKey);
+        let data = this.getCached(cacheKey);
         if (data) {
             console.log(`Returning cached ${cacheKey}`);
             return data.content;

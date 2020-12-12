@@ -1,8 +1,9 @@
 const lowdb = require('lowdb');
 
-const FileSync = require('lowdb/adapters/FileSync')
-const Memory = require('lowdb/adapters/Memory')
-const adapter = process.env.NODE_ENV === 'production' ? new Memory() : new FileSync('db.json');
+const FileAdapter = require('lowdb/adapters/FileSync')
+// const Memory = require('lowdb/adapters/Memory')
+// const adapter = process.env.NODE_ENV === 'production' ? new Memory() : new FileSync('db.json');
+const adapter = new FileAdapter('db.json');
 
 class DbManager {
     constructor() {
@@ -27,14 +28,19 @@ class DbManager {
 
     put(key, content, expireSeconds, collectionName = "shows") {
         console.log(`Storing ${key} in ${collectionName}`);
-        let expires = Date.now() + (expireSeconds * 1000);
+        const expires = Date.now() + (expireSeconds * 1000);
         key = key.trim().toLowerCase();
 
         // console.log(content);
 
-        let collection = this.db.get(collectionName);
-        // .remove({ id: key })
-        collection.push({ id: key, content, expires }).write();
+        const collection = this.db.get(collectionName);
+        const exists = collection.find({ id: key }).value();
+        if (exists) {
+            // collection.remove({ id: key }).write();
+            collection.find({ id: key }).assign({ content, expires }).write();
+        } else {
+            collection.push({ id: key, content, expires }).write();
+        }
     }
 
     runGarbageCollector() {
