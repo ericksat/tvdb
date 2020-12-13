@@ -52,6 +52,7 @@ class Fetcher {
 
     /** For fetch requests */
     getOpts() {
+        // console.log("Token: " + token.content);
         return {
             headers: {
                 'Authorization': `Bearer ${token.content}`,
@@ -115,53 +116,74 @@ class Fetcher {
     }
 
     async getActors(showId) {
-        const url = `${REMOTE}series/${showId}/actors`;
-        // console.log("Getting actors", url);
-        let response = await axios.get(url, this.getOpts());
-        let actors = response.data.data;
-        return actors.map(actor => {
-            return {
-                id: actor.id,
-                image: actor.image ? `${REMOTE_ARTWORK}banners/${actor.image}` : null,
-                name: actor.name,
-                role: actor.role,
-                sortOrder: actor.sortOrder
-            };
-        }).sort((a, b) => {
-            return a.sortOrder - b.sortOrder;
-        });
+        try {
+            const url = `${REMOTE}series/${showId}/actors`;
+            // console.log("Getting actors", url);
+            let response = await axios.get(url, this.getOpts());
+            let actors = response.data.data;
+            return actors.map(actor => {
+                return {
+                    id: actor.id,
+                    image: actor.image ? `${REMOTE_ARTWORK}banners/${actor.image}` : null,
+                    name: actor.name,
+                    role: actor.role,
+                    sortOrder: actor.sortOrder
+                };
+            }).sort((a, b) => {
+                return a.sortOrder - b.sortOrder;
+            });
+        } catch (e) {
+            console.log("Failed to fetch actors for " + showId);
+            return [];
+        }
+
     }
 
     async getSeasons(showId) {
-        const url = `${REMOTE}series/${showId}/episodes/summary`;
-        let response = await axios.get(url, this.getOpts());
-        let data = response.data.data;
-        if (data.airedSeasons && data.airedSeasons.length > 0) {
-            return {
-                episodes: data.airedEpisodes,
-                seasons: data.airedSeasons.reduce((a, b) => Math.max(a, b))
+        try {
+            const url = `${REMOTE}series/${showId}/episodes/summary`;
+            let response = await axios.get(url, this.getOpts());
+            let data = response.data.data;
+            if (data.airedSeasons && data.airedSeasons.length > 0) {
+                return {
+                    episodes: data.airedEpisodes,
+                    seasons: data.airedSeasons.reduce((a, b) => Math.max(a, b))
+                }
             }
-        }
-        if (data.dvdSeasons && data.dvdSeasons.length > 0) {
-            return {
-                episodes: data.dvdEpisodes,
-                seasons: data.dvdSeasons.reduce((a, b) => Math.max(a, b))
+            if (data.dvdSeasons && data.dvdSeasons.length > 0) {
+                return {
+                    episodes: data.dvdEpisodes,
+                    seasons: data.dvdSeasons.reduce((a, b) => Math.max(a, b))
+                }
             }
-        }
 
-        return {
-            episodes: 0,
-            seasons: 0
+            return {
+                episodes: 0,
+                seasons: 0
+            }
+        } catch (e) {
+            console.log(`Failed to get seasons for ${showId}`);
+
+            return {
+                episodes: 0,
+                seasons: 0
+            }
+            // throw new BadApiError();
         }
     }
 
     async getPosters(showId) {
-        const url = `${REMOTE}series/${showId}/images/query?keyType=poster`;
-        // console.log("Getting actors", url);
-        let response = await axios.get(url, this.getOpts());
-        let posters = response.data.data;
-        posters = posters.map((poster) => `${REMOTE_ARTWORK}banners/${poster.thumbnail}`);
-        return posters;
+        try {
+            const url = `${REMOTE}series/${showId}/images/query?keyType=poster`;
+            // console.log("Getting actors", url);
+            let response = await axios.get(url, this.getOpts());
+            let posters = response.data.data;
+            posters = posters.map((poster) => `${REMOTE_ARTWORK}banners/${poster.thumbnail}`);
+            return posters;
+        } catch (e) {
+            console.log(`Failed to get posters for ${showId}`);
+            return [];
+        }
     }
 
     async search(query) {
@@ -231,15 +253,10 @@ class Fetcher {
 
             if (!data.seriesName) throw new BadApiError();
 
-            // Add ours
-            try {
-                data.actors = await this.getActors(showId);
-                data.seasons = await this.getSeasons(showId);
-                data.posters = await this.getPosters(showId);
-            } catch (e) {
-                console.log(`Failed to get additional data for ${showId}`);
-                throw new BadApiError();
-            }
+            // Add related data
+            data.actors = await this.getActors(showId);
+            data.seasons = await this.getSeasons(showId);
+            data.posters = await this.getPosters(showId);
 
             data.banner = data.banner ? `${REMOTE_ARTWORK}banners/${data.banner}` : null;
 
