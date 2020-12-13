@@ -251,6 +251,8 @@ class Fetcher {
                 'seriesName', 'status', 'genre', 'rating', 'siteRating'
             ]);
 
+            data.aliases = []; // I don't want to display those anymore
+
             if (!data.seriesName) throw new BadApiError();
 
             // Add related data
