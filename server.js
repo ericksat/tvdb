@@ -58,7 +58,7 @@ app.get('/api/show/:id', async (req, res) => {
 
 app.get('/api/search/:query', async (req, res) => {
     try {
-        let fetchRes = await fetcher.search(req.params.query);
+        let fetchRes = await fetcher.search(req.params.query, req.query.save === "true");
         res.send(fetchRes);
     } catch (e) {
         res.send({ success: false, error: e.message });
@@ -75,15 +75,15 @@ app.get('/api/episodes/:id/:season', async (req, res) => {
     }
 });
 
-app.get('/api/suggestions/:query', (req, res) => {
-    let suggestions = fetcher.fetchSuggestions(req.params.query.trim());
-    res.send({success: true, suggestions});
-});
+// app.get('/api/suggestions/:query', (req, res) => {
+//     let suggestions = fetcher.fetchSuggestions(req.params.query.trim());
+//     res.send({success: true, suggestions});
+// });
 
-app.get('/api/suggestions', (req, res) => {
-    let suggestions = fetcher.fetchSuggestions();
-    res.send({ success: true, suggestions });
-});
+// app.get('/api/suggestions', (req, res) => {
+//     let suggestions = fetcher.fetchSuggestions();
+//     res.send({ success: true, suggestions });
+// });
 
 app.get('/api/login', async (req, res) => {
     try {

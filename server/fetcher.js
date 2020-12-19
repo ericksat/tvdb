@@ -186,10 +186,11 @@ class Fetcher {
         }
     }
 
-    async search(query) {
+    async search(query, storeResults) {
+        storeResults = query.length >= 4; // storeResults || false;
         // Try cache first
         const cacheKey = `search:${query.trim().toLowerCase()}`;
-        let data = this.getCached(cacheKey);
+        let data = storeResults ? this.getCached(cacheKey) : null;
         if (data) {
             console.log(`Returning cached ${cacheKey}`);
             return data.content;
@@ -212,9 +213,12 @@ class Fetcher {
             });
 
             // console.log("final data", data);
-            this.putInCache(cacheKey, data, SEARCH_CACHE_TIME);
-            // console.log("Cached, adding suggestion");
-            db.addSuggestion(query.trim()); // A successful result will be used in future suggestions
+            if (storeResults) {
+                // console.log("Storing search in DB");
+                this.putInCache(cacheKey, data, SEARCH_CACHE_TIME);
+                // console.log("Cached, adding suggestion");
+                // db.addSuggestion(query.trim()); // A successful result will be used in future suggestions
+            }
             return data;
         } catch (e) {
             console.log(`Failed to fetch ${url}`, e.message, e.stack);
@@ -233,6 +237,7 @@ class Fetcher {
         let data = this.getCached(cacheKey);
         if (data) {
             console.log(`Returning cached ${cacheKey}`);
+            // console.log("final data", data.content);
             return data.content;
         }
         console.log(`Did not find ${cacheKey} in db.`);
@@ -262,7 +267,6 @@ class Fetcher {
 
             data.banner = data.banner ? `${REMOTE_ARTWORK}banners/${data.banner}` : null;
 
-            // console.log("final data", data);
             this.putInCache(cacheKey, data, SHOW_CACHE_TIME);
             return data;
         } catch (e) {
@@ -294,7 +298,7 @@ class Fetcher {
         // console.log("Token = ", token);
         // Check expiration
         if (token && !token.expired) {
-            console.log("Token is still good");
+            // console.log("Token is still good " + token.content);
             return next(); // We're good
         }
         // Try refresh
@@ -351,9 +355,9 @@ class Fetcher {
         db.runGarbageCollector();
     }
 
-    fetchSuggestions(filter) {
-        return db.getSuggestions(filter)
-    }
+    // fetchSuggestions(filter) {
+    //     return db.getSuggestions(filter)
+    // }
 }
 
 module.exports = {Fetcher};

@@ -8,7 +8,7 @@ class DbManager {
     constructor() {
         this.db = lowdb(adapter);
         // Set some defaults
-        this.db.defaults({ shows: [], episodes: [], suggestions: [], search: [], token: null }).write();
+        this.db.defaults({ shows: [], episodes: [], search: [], token: null }).write();
     }
 
     get(key, collection = "shows") {
@@ -26,7 +26,7 @@ class DbManager {
     }
 
     put(key, content, expireSeconds, collectionName = "shows") {
-        console.log(`Storing ${key} in ${collectionName}`);
+        // console.log(`Storing ${key} in ${collectionName}`);
         const expires = Date.now() + (expireSeconds * 1000);
         key = key.trim().toLowerCase();
 
@@ -71,23 +71,23 @@ class DbManager {
         this.db.set('token', token).write()
     }
 
-    getSuggestions(filter) {
-        if (!filter) {
-            return this.db.get('suggestions').value();
-        } // Else filter
-        return this.db.get('suggestions').filter((one) => one.indexOf(filter) === 0).value();
-    }
+    // getSuggestions(filter) {
+    //     if (!filter) {
+    //         return this.db.get('suggestions').value();
+    //     } // Else filter
+    //     return this.db.get('suggestions').filter((one) => one.indexOf(filter) === 0).value();
+    // }
 
-    addSuggestion(value) {
-        // Make sure it doesn't exist yet
-        let collection = this.db.get('suggestions');
-        let exist = collection.filter((one) => one === value).size().value();
-        // console.log(exist);
-        if (!exist) {
-            // console.log("Adding suggestion " + value);
-            collection.push(value).write();
-        }
-    }
+    // addSuggestion(value) {
+    //     // Make sure it doesn't exist yet
+    //     let collection = this.db.get('suggestions');
+    //     let exist = collection.filter((one) => one === value).size().value();
+    //     // console.log(exist);
+    //     if (!exist) {
+    //         // console.log("Adding suggestion " + value);
+    //         collection.push(value).write();
+    //     }
+    // }
 
 /*    getByAlias(alias) {
         alias = alias.toLowerCase();
